@@ -1,0 +1,37 @@
+module Import
+  ( module X
+  , grid
+  , parse
+  ) where
+
+import Protolude            as X
+import Data.Attoparsec.Text as X (Parser, decimal, sepBy)
+
+import           Control.Lens         ((+=), (.=), _1, _2)
+import           Data.Attoparsec.Text (Parser, atEnd, endOfLine, notChar, many', many1', parseOnly)
+import qualified Data.Cell            as Cell
+import qualified Data.Map             as Map
+import           Data.Text            (pack)
+
+parse :: Text -> Parser a -> IO a
+parse input parser = case parseOnly parser input of
+  Left  err -> die $ "Failed to parse input: " <> pack err
+  Right val -> return val
+
+grid :: Parser [(Int, Int, Char)]
+grid = evalStateT cells (0, 0)
+  where
+    cells = join <$> many' row
+
+    row = do
+      _1 .= 0
+      tiles <- many1' tile
+      lift $ endOfLine <|> void atEnd
+      _2 += 1
+      return tiles
+
+    tile = do
+      c <- lift $ notChar '\n'
+      (x, y) <- get
+      _1 += 1
+      return (x, y, c)

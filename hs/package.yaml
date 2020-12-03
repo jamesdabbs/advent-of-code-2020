@@ -1,0 +1,60 @@
+name:                aoc2020
+version:             0.1.0.0
+github:              "jamesdabbs/advent-of-code-2020"
+license:             BSD3
+author:              "James Dabbs"
+maintainer:          "james.dabbs@gmail.com"
+copyright:           "2020 James Dabbs"
+
+extra-source-files:
+- README.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/jamesdabbs/advent-of-code-2020>
+
+dependencies:
+- base >= 4.7 && < 5
+- attoparsec
+- containers
+- lens
+- protolude
+- text
+
+default-extensions:
+- LambdaCase
+- NamedFieldPuns
+- NoImplicitPrelude
+- OverloadedStrings
+
+library:
+  source-dirs: src
+
+executables:
+  main:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - aoc2020
+    - unix
+
+tests:
+  test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - aoc2020
+    - hspec

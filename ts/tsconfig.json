@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "target": "esnext",
+    "outDir": "./dst"
+  },
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "./dst",
+    "node_modules"
+  ]
+}
