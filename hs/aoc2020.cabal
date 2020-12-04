@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a3fe54e30c38df3eabce16471c64227864f90bb1f82995558d737c6a3585aa2b
+-- hash: e5c1a763a60fd98fa6fade99a6b00544b0010d6a0b54f4b586c37f2fb1f0385f
 
 name:           aoc2020
 version:        0.1.0.0
@@ -30,11 +30,13 @@ library
       P01
       P02
       P03
+      P04
   other-modules:
       Paths_aoc2020
   hs-source-dirs:
       src
   default-extensions: LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings
+  ghc-options: -O2 -Wall -fno-warn-deprecations -fno-warn-unused-do-bind
   build-depends:
       attoparsec
     , base >=4.7 && <5
@@ -51,7 +53,7 @@ executable main
   hs-source-dirs:
       app
   default-extensions: LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -O2 -Wall -fno-warn-deprecations -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aoc2020
     , attoparsec
@@ -69,16 +71,19 @@ test-suite test
   other-modules:
       P01Spec
       P02Spec
+      P04Spec
+      SpecImport
       Paths_aoc2020
   hs-source-dirs:
       test
-  default-extensions: LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  default-extensions: LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings QuasiQuotes
+  ghc-options: -O2 -Wall -fno-warn-deprecations -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aoc2020
     , attoparsec
     , base >=4.7 && <5
     , containers
+    , heredoc
     , hspec
     , lens
     , protolude

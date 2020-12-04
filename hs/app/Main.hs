@@ -2,15 +2,14 @@ module Main where
 
 import Import
 
-import Data.String        (String)
-import Data.Text          (pack)
-import System.Environment (getArgs)
-import System.Posix.Env   (getEnvDefault)
-import Text.Printf        (printf)
+import Data.Text        (pack)
+import System.Posix.Env (getEnvDefault)
+import Text.Printf      (printf)
 
 import qualified P01
 import qualified P02
 import qualified P03
+import qualified P04
 
 main :: IO ()
 main = getNumber >>= \case
@@ -21,6 +20,7 @@ main = getNumber >>= \case
       1 -> P01.solve input
       2 -> P02.solve input
       3 -> P03.solve input
+      4 -> P04.solve input
       _ -> die $ "Not implemented: #" <> show n
 
 getNumber :: IO (Either String Int)
