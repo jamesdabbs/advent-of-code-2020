@@ -8,7 +8,7 @@ import Text.Heredoc (str)
 spec :: Spec
 spec = do
   it "can check for required fields" $ do
-    let Right input = parseOnly parser
+    let Right input = parseOnly inputP
           [str|ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
               |byr:1937 iyr:2017 cid:147 hgt:183cm
               |
@@ -26,7 +26,7 @@ spec = do
     map hasRequiredKeys input `shouldBe` [True, False, True, False]
 
   it "finds invalid passports" $ do
-    let Right input = parseOnly parser
+    let Right input = parseOnly inputP
           [str|eyr:1972 cid:100
               |hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
               |
@@ -45,7 +45,7 @@ spec = do
     map valid input `shouldBe` [False, False, False, False]
 
   it "finds valid passports" $ do
-    let Right input = parseOnly parser
+    let Right input = parseOnly inputP
           [str|pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
               |hcl:#623a2f
               |

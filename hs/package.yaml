@@ -27,10 +27,16 @@ dependencies:
 - text
 
 default-extensions:
+- DeriveGeneric
+- FlexibleInstances
 - LambdaCase
 - NamedFieldPuns
 - NoImplicitPrelude
 - OverloadedStrings
+- RecordWildCards
+- StandaloneDeriving
+- TypeFamilies
+- TypeSynonymInstances
 ghc-options:
 - -O2
 - -Wall

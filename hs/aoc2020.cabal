@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e5c1a763a60fd98fa6fade99a6b00544b0010d6a0b54f4b586c37f2fb1f0385f
+-- hash: b60ba11b5bf5b941e0ed62e0825cfca9f3ab5256f5d14aa1d0f4f65c25754417
 
 name:           aoc2020
 version:        0.1.0.0
@@ -35,7 +35,7 @@ library
       Paths_aoc2020
   hs-source-dirs:
       src
-  default-extensions: LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings
+  default-extensions: DeriveGeneric FlexibleInstances LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings RecordWildCards StandaloneDeriving TypeFamilies TypeSynonymInstances
   ghc-options: -O2 -Wall -fno-warn-deprecations -fno-warn-unused-do-bind
   build-depends:
       attoparsec
@@ -52,7 +52,7 @@ executable main
       Paths_aoc2020
   hs-source-dirs:
       app
-  default-extensions: LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings
+  default-extensions: DeriveGeneric FlexibleInstances LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings RecordWildCards StandaloneDeriving TypeFamilies TypeSynonymInstances
   ghc-options: -O2 -Wall -fno-warn-deprecations -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aoc2020
@@ -76,7 +76,7 @@ test-suite test
       Paths_aoc2020
   hs-source-dirs:
       test
-  default-extensions: LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings QuasiQuotes
+  default-extensions: DeriveGeneric FlexibleInstances LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings RecordWildCards StandaloneDeriving TypeFamilies TypeSynonymInstances QuasiQuotes
   ghc-options: -O2 -Wall -fno-warn-deprecations -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aoc2020
