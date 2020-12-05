@@ -6,7 +6,7 @@ import           Data.Attoparsec.Text (count, satisfy, takeTill, takeWhile)
 import qualified Data.Map             as Map
 import qualified Data.Set             as Set
 import qualified Data.Text            as Text
-import           Generic              (HKD, fields, parseStruct)
+import           Generic              (HKD, enumParser, fields, parseStruct)
 
 -- A group of key:value pairs which _may_ represent a valid passport
 type FieldSet = Map Text Text
@@ -34,7 +34,7 @@ newtype HexColor = HexColor Text
   deriving (Show, Eq)
 
 data EyeColor = Amb | Blu | Brn | Gry | Grn | Hzl | Oth
-  deriving (Show, Eq)
+  deriving (Show, Eq, Enum, Bounded)
 
 {- By the above, this is equivalent to
 
@@ -80,7 +80,7 @@ passportP = Passport
   , eyr = rangeP 2020 2030
   , hgt = heightP
   , hcl = hexColorP
-  , ecl = eyeColorP
+  , ecl = enumParser
   , pid = Text.pack <$> count 9 digit
   }
 
@@ -109,20 +109,6 @@ hexColorP = do
   "#"
   digits <- count 6 $ satisfy $ inClass "a-f0-9"
   return $ HexColor $ Text.pack digits
-
-eyeColorP :: Parser EyeColor
-eyeColorP = choice $ map test
-  [ ("amb", Amb)
-  , ("blu", Blu)
-  , ("brn", Brn)
-  , ("gry", Gry)
-  , ("grn", Grn)
-  , ("hzl", Hzl)
-  , ("oth", Oth)
-  ]
-  where
-    test :: (Text, EyeColor) -> Parser EyeColor
-    test (key, color) = string key *> return color
 
 valid :: FieldSet -> Bool
 valid = isJust . parseStruct passportP

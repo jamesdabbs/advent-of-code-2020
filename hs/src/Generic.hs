@@ -1,18 +1,23 @@
-{-# LANGUAGE DefaultSignatures #-}
 module Generic
   ( HKD
+  , enumParser
   , fields
   , parseStruct
   ) where
 
 import Protolude
 
-import           Data.Attoparsec.Text (Parser, endOfInput, parseOnly)
+import           Data.Attoparsec.Text (Parser, choice, endOfInput, parseOnly, string)
 import           Data.String          (String)
 import qualified Data.Map             as Map
 import qualified Data.Set             as Set
 import qualified Data.Text            as Text
 import           GHC.Generics         ()
+
+enumParser :: (Bounded e, Enum e, Show e) => Parser e
+enumParser = choice $ map p [minBound .. maxBound]
+  where
+    p e = string (Text.toLower $ show e) *> pure e
 
 {- See https://reasonablypolymorphic.com/blog/higher-kinded-data for a great
   writeup of the sort of generic programming present in this file, and the
@@ -106,3 +111,4 @@ runParser parser key fs =
   $ parseOnly (parser <* endOfInput)
   $ maybe "" identity
   $ Map.lookup (Text.pack key) fs
+

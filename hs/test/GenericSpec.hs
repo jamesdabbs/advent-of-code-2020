@@ -15,6 +15,9 @@ type Demo = Demo' Identity
 deriving instance Show Demo
 deriving instance Eq Demo
 
+data Key = F | G | A | Bb
+  deriving (Show, Eq, Ord, Bounded, Enum)
+
 parser :: Demo' Parser
 parser = Demo
   { foo = decimal
@@ -23,6 +26,16 @@ parser = Demo
 
 spec :: Spec
 spec = do
+  describe "enumParser" $ do
+    it "parses single characters" $
+      parseOnly enumParser "f" `shouldBe` Right F
+
+    it "parses multiple characters" $
+      parseOnly enumParser "bb" `shouldBe` Right Bb
+
+    it "can fail" $
+      parseOnly enumParser "x" `shouldBe` (Left "Failed reading: empty" :: Either String Key)
+
   describe "fields" $ do
     it "lists field names" $ do
       fields parser `shouldBe` Set.fromList ["foo", "bar"]
