@@ -21,16 +21,34 @@ description:         Please see the README on GitHub at <https://github.com/jame
 dependencies:
 - base >= 4.7 && < 5
 - attoparsec
+- bytestring
 - containers
 - lens
 - protolude
 - text
 
 default-extensions:
+- DeriveGeneric
+- FlexibleContexts
+- FlexibleInstances
 - LambdaCase
+- MultiParamTypeClasses
 - NamedFieldPuns
 - NoImplicitPrelude
 - OverloadedStrings
+- PolyKinds
+- RecordWildCards
+- ScopedTypeVariables
+- StandaloneDeriving
+- TypeFamilies
+- TypeOperators
+- TypeSynonymInstances
+ghc-options:
+- -O2
+- -Wall
+# - -Werror
+- -fno-warn-deprecations
+- -fno-warn-unused-do-bind
 
 library:
   source-dirs: src
@@ -57,4 +75,8 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - aoc2020
+    - heredoc
     - hspec
+    default-extensions:
+    - QuasiQuotes
+

@@ -5,7 +5,9 @@ module Import
   ) where
 
 import Protolude            as X
-import Data.Attoparsec.Text as X (Parser, decimal, sepBy)
+import Data.Attoparsec.Text as X (Parser, choice, decimal, digit, endOfInput, inClass, parseOnly, sepBy, string)
+import Data.Char            as X (isAlpha, isSpace)
+import Data.String          as X (String)
 
 import           Control.Lens         ((+=), (.=), _1, _2)
 import           Data.Attoparsec.Text (Parser, atEnd, endOfLine, notChar, many', many1', parseOnly)
