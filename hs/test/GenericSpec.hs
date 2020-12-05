@@ -23,6 +23,10 @@ deriving instance Show DemoText
 
 deriving instance Eq DemoText
 
+deriving instance Show (Demo' (Either String))
+
+deriving instance Eq (Demo' (Either String))
+
 data Key = F | G | A | Bb
   deriving (Show, Eq, Ord, Bounded, Enum)
 
@@ -51,20 +55,19 @@ spec = do
 
   describe "parse" $
     it "applies a parser to structured input" $
-      parse parser (Demo "123" "right") `shouldBe` Right (Demo 123 "right")
+      parse parser (Demo "123" "right")
+        `shouldBe` (Demo (Right 123) (Right "right"))
 
   describe "parseStruct" $ do
-    let run :: [(Text, Text)] -> Either String Demo
-        run = parseStruct parser . Map.fromList
+    let run = parseStruct parser . Map.fromList
 
     it "can parse valid data" $ do
       run [("foo", "123"), ("bar", "right")] `shouldBe` Right (Demo 123 "right")
       run [("foo", "456"), ("bar", "left")] `shouldBe` Right (Demo 456 "left")
 
     it "can fail to parse" $ do
-      -- TODO: better error messages here
-      run [("foo", "abc"), ("bar", "right")] `shouldBe` Left "Failed reading: takeWhile1"
-      run [("foo", "123"), ("bar", "top")] `shouldBe` Left "string"
+      run [("foo", "abc"), ("bar", "right")] `shouldBe` Left (Map.singleton "foo" "Failed reading: takeWhile1")
+      run [("foo", "123"), ("bar", "top")] `shouldBe` Left (Map.singleton "bar" "string")
 
   describe "struct" $ do
     it "parses from a map" $ do

@@ -85,11 +85,6 @@ struct fs = to <$> gstruct fs
 class GStruct o where
   gstruct :: Map Text Text -> Maybe (o p)
 
-instance Selector s => GStruct (S1 s (Rec0 Text)) where
-  gstruct fs = M1 . K1 <$> Map.lookup label fs
-    where
-      label = Text.pack $ selName (undefined :: S1 s (Rec0 Text) ())
-
 instance Selector s => GStruct (S1 s (Rec0 (Const Text a))) where
   gstruct fs = M1 . K1 . Const <$> Map.lookup label fs
     where
@@ -144,44 +139,43 @@ instance (GValidate i o, GValidate i' o') => GValidate (i :*: i') (o :*: o') whe
    struct-of-inputs to get a struct-of-results
 -}
 parse ::
-  ( GParse (Rep (f Parser)) (Rep (f (Const Text))) (Rep (f Identity)),
+  ( GParse (Rep (f Parser)) (Rep (f (Const Text))) (Rep (f (Either String))),
     Generic (f Parser),
     Generic (f (Const Text)),
-    Generic (f Identity)
+    Generic (f (Either String))
   ) =>
   f Parser ->
   f (Const Text) ->
-  Either String (f Identity)
-parse parser input = to <$> gparse (from parser) (from input)
+  f (Either String)
+parse parser input = to $ gparse (from parser) (from input)
 
 class GParse p i o where
-  gparse :: p x -> i x -> Either String (o x)
+  gparse :: p x -> i x -> o x
 
-instance GParse (Rec0 (Parser a)) (Rec0 Text) (Rec0 a) where
-  gparse (K1 parser) (K1 input) = K1 <$> run parser input
-
-instance GParse (Rec0 (Parser a)) (Rec0 (Const Text a)) (Rec0 a) where
-  gparse (K1 parser) (K1 (Const input)) = K1 <$> run parser input
+instance GParse (Rec0 (Parser a)) (Rec0 (Const Text a)) (Rec0 (Either String a)) where
+  gparse (K1 parser) (K1 (Const input)) = K1 $ run parser input
 
 instance (GParse p i o) => GParse (M1 a b p) (M1 a' b' i) (M1 a'' b'' o) where
-  gparse (M1 p) (M1 i) = M1 <$> gparse p i
+  gparse (M1 p) (M1 i) = M1 $ gparse p i
 
 instance (GParse p i o, GParse p' i' o') => GParse (p :*: p') (i :*: i') (o :*: o') where
-  gparse (p :*: p') (i :*: i') = (:*:) <$> gparse p i <*> gparse p' i'
+  gparse (p :*: p') (i :*: i') = gparse p i :*: gparse p' i'
 
 run :: Parser a -> Text -> Either String a
 run parser = parseOnly (parser <* endOfInput)
 
 parseStruct ::
   ( GStruct (Rep (f (Const Text))),
-    GParse (Rep (f Parser)) (Rep (f (Const Text))) (Rep (f Identity)),
+    GValidate (Rep (f (Either String))) (Rep (f Identity)),
+    GParse (Rep (f Parser)) (Rep (f (Const Text))) (Rep (f (Either String))),
     Generic (f (Const Text)),
+    Generic (f (Either String)),
     Generic (f Parser),
     Generic (f Identity)
   ) =>
   f Parser ->
   Map Text Text ->
-  Either String (f Identity)
+  Either (Map String String) (f Identity)
 parseStruct parser fs = case struct fs of
-  Just input -> parse parser input
-  _ -> Left "could not parse structure"
+  Nothing -> Left $ Map.singleton "TODO" "could not parse structure"
+  Just input -> validate $ parse parser input
