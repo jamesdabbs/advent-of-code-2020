@@ -15,6 +15,6 @@ solutions = examples.map do |n|
 end.join("\n")
 
 initial = File.read(input)
-code = initial.sub('{{IMPORTS}}', imports).sub('{{SOLUTIONS}}', solutions)
+code = initial.sub('-- IMPORTS', imports).sub('-- SOLUTIONS', solutions)
 
 File.write(output, code)

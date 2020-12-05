@@ -4,9 +4,9 @@ module Problems (run) where
 
 import Protolude
 
-{{IMPORTS}}
+-- IMPORTS
 
 run :: Int -> Text -> IO ()
 run n input = case n of
-{{SOLUTIONS}}
+-- SOLUTIONS
   _ -> die $ "Not implemented: #" <> show n
