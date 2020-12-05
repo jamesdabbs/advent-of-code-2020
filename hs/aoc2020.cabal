@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0bed043aaa61866eb8f86475e4952ef9df1b40ab83fe8b3a4b08bb84a692cce8
+-- hash: f0c5e1a5842b0057577dba1b4a4e164f3cf5a9f30e43e9a555faa258d165ee28
 
 name:           aoc2020
 version:        0.1.0.0
@@ -50,6 +50,7 @@ library
 executable main
   main-is: Main.hs
   other-modules:
+      Problems
       Paths_aoc2020
   hs-source-dirs:
       app
