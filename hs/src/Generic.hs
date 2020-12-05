@@ -1,23 +1,25 @@
 module Generic
-  ( HKD
-  , enumParser
-  , fields
-  , parseStruct
-  ) where
+  ( HKD,
+    enumParser,
+    fields,
+    parse,
+    parseStruct,
+    struct,
+  )
+where
 
+import Data.Attoparsec.Text (Parser, choice, endOfInput, parseOnly, string)
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+import Data.String (String)
+import qualified Data.Text as Text
+import GHC.Generics ()
 import Protolude
 
-import           Data.Attoparsec.Text (Parser, choice, endOfInput, parseOnly, string)
-import           Data.String          (String)
-import qualified Data.Map             as Map
-import qualified Data.Set             as Set
-import qualified Data.Text            as Text
-import           GHC.Generics         ()
-
 enumParser :: (Bounded e, Enum e, Show e) => Parser e
-enumParser = choice $ map p [minBound .. maxBound]
+enumParser = choice $ map opt [minBound .. maxBound]
   where
-    p e = string (Text.toLower $ show e) *> pure e
+    opt e = string (Text.toLower $ show e) *> pure e
 
 {- See https://reasonablypolymorphic.com/blog/higher-kinded-data for a great
   writeup of the sort of generic programming present in this file, and the
@@ -25,7 +27,7 @@ enumParser = choice $ map p [minBound .. maxBound]
 -}
 type family HKD f a where
   HKD Identity a = a
-  HKD f        a = f a
+  HKD f a = f a
 
 {- Defines a generic function for extracting the names of record types
 
@@ -67,48 +69,82 @@ instance (GFields i) => GFields (C1 a i) where
 instance (Selector s) => GFields (S1 s (Rec0 i)) where
   gfields (M1 _) = Set.singleton $ Text.pack $ selName (undefined :: S1 s (Rec0 i) ())
 
+{- struct gives us a generic tool for casting from a map to a record where field
+   names match the map keys
 
-{- Defines a generic function for applying a struct of parsers to produce a
-   struct of the same type
-
-   parseStruct
-     (Struct { a = parseA, b = parseB })
-     (Map.fromList [("a", "..."), ("b", "...")])
-     = Just (Struct { a = ..., b = ... }) -- if parsing succeeds
-       Nothing                            -- if parsing fails
+     struct (Map.fromList [("foo", "a"), ("bar", "b")]) =
+       Just (Struct { foo = "a", bar = "b" })
 -}
-parseStruct :: ( Generic (f Parser)
-               , Generic (f Identity)
-               , GParse (Rep (f Parser)) (Rep (f Identity))
-               )
-            => f Parser -> Map Text Text -> Either String (f Identity)
-parseStruct parser = fmap to . gparse (from parser)
+struct ::
+  (Generic (f (Const a)), GStruct (Rep (f (Const a)))) =>
+  Map Text Text ->
+  Maybe (f (Const a))
+struct fs = to <$> gstruct fs
 
-class GParse i o where
-  gparse :: i p -> Map Text Text -> Either String (o p)
+class GStruct o where
+  gstruct :: Map Text Text -> Maybe (o p)
 
-instance (GParse i o, GParse i' o') => GParse (i :*: i') (o :*: o') where
-  gparse (l :*: r) fs = (:*:) <$> gparse l fs <*> gparse r fs
-
-instance (GParse i o, GParse i' o') => GParse (i :+: i') (o :+: o') where
-  gparse (L1 l) fs = L1 <$> gparse l fs
-  gparse (R1 r) fs = R1 <$> gparse r fs
-
-instance (GParse i o) => GParse (D1 b i) (D1 b' o) where
-  gparse (M1 x) fs = M1 <$> gparse x fs
-
-instance (GParse i o) => GParse (C1 b i) (C1 b' o) where
-  gparse (M1 x) fs = M1 <$> gparse x fs
-
-instance Selector s => GParse (S1 s (K1 a (Parser p))) (S1 s (K1 a p)) where
-  gparse (M1 (K1 parser)) fs = (M1 . K1) <$> runParser parser label fs
+instance Selector s => GStruct (S1 s (Rec0 Text)) where
+  gstruct fs = M1 . K1 <$> Map.lookup label fs
     where
-      label = selName (undefined :: S1 s (K1 a (Parser p)) ())
+      label = Text.pack $ selName (undefined :: S1 s (Rec0 Text) ())
 
-runParser :: Parser p -> String -> Map Text Text -> Either String p
-runParser parser key fs =
-  either (const $ Left key) Right
-  $ parseOnly (parser <* endOfInput)
-  $ maybe "" identity
-  $ Map.lookup (Text.pack key) fs
+instance Selector s => GStruct (S1 s (Rec0 (Const Text a))) where
+  gstruct fs = M1 . K1 . Const <$> Map.lookup label fs
+    where
+      label = Text.pack $ selName (undefined :: S1 s (Rec0 Text) ())
 
+instance (GStruct i, GStruct i') => GStruct (i :*: i') where
+  gstruct fs = (:*:) <$> gstruct fs <*> gstruct fs
+
+instance (GStruct i) => GStruct (D1 b i) where
+  gstruct fs = M1 <$> gstruct fs
+
+instance (GStruct i) => GStruct (C1 b i) where
+  gstruct fs = M1 <$> gstruct fs
+
+{- parse gives us a generic means of applying a struct-of-parsers to a similar
+   struct-of-inputs to get a struct-of-results
+-}
+parse ::
+  ( GParse (Rep (f Parser)) (Rep (f (Const Text))) (Rep (f Identity)),
+    Generic (f Parser),
+    Generic (f (Const Text)),
+    Generic (f Identity)
+  ) =>
+  f Parser ->
+  f (Const Text) ->
+  Either String (f Identity)
+parse parser input = to <$> gparse (from parser) (from input)
+
+class GParse p i o where
+  gparse :: p x -> i x -> Either String (o x)
+
+instance GParse (Rec0 (Parser a)) (Rec0 Text) (Rec0 a) where
+  gparse (K1 parser) (K1 input) = K1 <$> run parser input
+
+instance GParse (Rec0 (Parser a)) (Rec0 (Const Text a)) (Rec0 a) where
+  gparse (K1 parser) (K1 (Const input)) = K1 <$> run parser input
+
+instance (GParse p i o) => GParse (M1 a b p) (M1 a' b' i) (M1 a'' b'' o) where
+  gparse (M1 p) (M1 i) = M1 <$> gparse p i
+
+instance (GParse p i o, GParse p' i' o') => GParse (p :*: p') (i :*: i') (o :*: o') where
+  gparse (p :*: p') (i :*: i') = (:*:) <$> gparse p i <*> gparse p' i'
+
+run :: Parser a -> Text -> Either String a
+run parser = parseOnly (parser <* endOfInput)
+
+parseStruct ::
+  ( GStruct (Rep (f (Const Text))),
+    GParse (Rep (f Parser)) (Rep (f (Const Text))) (Rep (f Identity)),
+    Generic (f (Const Text)),
+    Generic (f Parser),
+    Generic (f Identity)
+  ) =>
+  f Parser ->
+  Map Text Text ->
+  Either String (f Identity)
+parseStruct parser fs = case struct fs of
+  Just input -> parse parser input
+  _ -> Left "could not parse structure"
