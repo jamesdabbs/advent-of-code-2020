@@ -1,5 +1,6 @@
 module Generic
   ( HKD,
+    Messages,
     enumParser,
     fields,
     parse,
@@ -16,6 +17,8 @@ import Data.String (String)
 import qualified Data.Text as Text
 import GHC.Generics ()
 import Protolude
+
+type Messages = Map String String
 
 enumParser :: (Bounded e, Enum e, Show e) => Parser e
 enumParser = choice $ map opt [minBound .. maxBound]
@@ -77,21 +80,29 @@ instance (Selector s) => GFields (S1 s (Rec0 i)) where
        Just (Struct { foo = "a", bar = "b" })
 -}
 struct ::
-  (Generic (f (Const a)), GStruct (Rep (f (Const a)))) =>
+  (Generic (f p), GStruct (Rep (f p))) =>
   Map Text Text ->
-  Maybe (f (Const a))
+  Either Messages (f p)
 struct fs = to <$> gstruct fs
 
 class GStruct o where
-  gstruct :: Map Text Text -> Maybe (o p)
+  gstruct :: Map Text Text -> Either Messages (o p)
 
 instance Selector s => GStruct (S1 s (Rec0 (Const Text a))) where
-  gstruct fs = M1 . K1 . Const <$> Map.lookup label fs
+  gstruct fs =
+    maybe
+      (Left $ Map.singleton label "not found")
+      (Right . M1 . K1 . Const)
+      $ Map.lookup (Text.pack label) fs
     where
-      label = Text.pack $ selName (undefined :: S1 s (Rec0 Text) ())
+      label = selName (undefined :: S1 s (Rec0 Text) ())
 
 instance (GStruct i, GStruct i') => GStruct (i :*: i') where
-  gstruct fs = (:*:) <$> gstruct fs <*> gstruct fs
+  gstruct fs = case (gstruct fs, gstruct fs) of
+    (Right o, Right o') -> Right (o :*: o')
+    (Left s, Left s') -> Left (s <> s')
+    (Left s, _) -> Left s
+    (_, Left s') -> Left s'
 
 instance (GStruct i) => GStruct (D1 b i) where
   gstruct fs = M1 <$> gstruct fs
@@ -110,8 +121,6 @@ validate ::
   f (Either String) ->
   Either Messages (f Identity)
 validate i = to <$> gvalidate (from i)
-
-type Messages = Map String String
 
 class GValidate i o where
   gvalidate :: i x -> Either Messages (o x)
@@ -176,6 +185,5 @@ parseStruct ::
   f Parser ->
   Map Text Text ->
   Either (Map String String) (f Identity)
-parseStruct parser fs = case struct fs of
-  Nothing -> Left $ Map.singleton "TODO" "could not parse structure"
-  Just input -> validate $ parse parser input
+parseStruct parser fs =
+  validate . parse parser =<< struct fs

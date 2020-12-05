@@ -71,10 +71,10 @@ spec = do
 
   describe "struct" $ do
     it "parses from a map" $ do
-      let parsed :: Maybe DemoText
+      let parsed :: Either Messages DemoText
           parsed = struct $ Map.fromList [("foo", "a"), ("bar", "b")]
 
-      parsed `shouldBe` Just (Demo {foo = "a", bar = "b"})
+      parsed `shouldBe` Right (Demo {foo = "a", bar = "b"})
 
   describe "validate" $ do
     it "passes if all right" $
