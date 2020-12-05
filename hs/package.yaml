@@ -21,6 +21,7 @@ description:         Please see the README on GitHub at <https://github.com/jame
 dependencies:
 - base >= 4.7 && < 5
 - attoparsec
+- bytestring
 - containers
 - lens
 - protolude
@@ -28,14 +29,19 @@ dependencies:
 
 default-extensions:
 - DeriveGeneric
+- FlexibleContexts
 - FlexibleInstances
 - LambdaCase
+- MultiParamTypeClasses
 - NamedFieldPuns
 - NoImplicitPrelude
 - OverloadedStrings
+- PolyKinds
 - RecordWildCards
+- ScopedTypeVariables
 - StandaloneDeriving
 - TypeFamilies
+- TypeOperators
 - TypeSynonymInstances
 ghc-options:
 - -O2

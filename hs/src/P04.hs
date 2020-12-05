@@ -4,7 +4,9 @@ import Import hiding (pass, takeWhile)
 
 import           Data.Attoparsec.Text (count, satisfy, takeTill, takeWhile)
 import qualified Data.Map             as Map
+import qualified Data.Set             as Set
 import qualified Data.Text            as Text
+import           Generic              (HKD, fields, parseStruct)
 
 -- A group of key:value pairs which _may_ represent a valid passport
 type FieldSet = Map Text Text
@@ -15,10 +17,6 @@ type FieldSet = Map Text Text
 --
 -- See https://reasonablypolymorphic.com/blog/higher-kinded-data for a great
 -- writeup of this technique.
-type family HKD f a where
-  HKD Identity a = a
-  HKD f        a = f a
-
 data Passport' a = Passport
   { byr :: HKD a Int
   , iyr :: HKD a Int
@@ -52,6 +50,7 @@ data EyeColor = Amb | Blu | Brn | Gry | Grn | Hzl | Oth
 -}
 type Passport = Passport' Identity
 deriving instance Show Passport
+deriving instance Eq Passport
 
 solve :: Text -> IO ()
 solve input = do
@@ -72,9 +71,7 @@ inputP = passport `sepBy` "\n\n"
       return (key, value)
 
 hasRequiredKeys :: FieldSet -> Bool
-hasRequiredKeys m = all
-  (flip Map.member m)
-  ["byr" , "iyr" , "eyr" , "hgt" , "hcl" , "ecl" , "pid"]
+hasRequiredKeys m = fields passportP `Set.isSubsetOf` Set.fromList (Map.keys m)
 
 passportP :: Passport' Parser
 passportP = Passport
@@ -127,29 +124,5 @@ eyeColorP = choice $ map test
     test :: (Text, EyeColor) -> Parser EyeColor
     test (key, color) = string key *> return color
 
--- TODO: similar to https://reasonablypolymorphic.com/blog/higher-kinded-data
--- we should be able to define a
---
---   parseFields :: f Parser -> FieldSet -> Maybe (f Identity)
---
--- for a suitably generic f, which we can then specialize to f = Passport' and
--- get this for free.
-parseFields :: Passport' Parser -> FieldSet -> Maybe Passport
-parseFields Passport {..} fields = Passport
-  <$> parseField "byr" byr
-  <*> parseField "iyr" iyr
-  <*> parseField "eyr" eyr
-  <*> parseField "hgt" hgt
-  <*> parseField "hcl" hcl
-  <*> parseField "ecl" ecl
-  <*> parseField "pid" pid
-  where
-    parseField :: Text -> Parser a -> Maybe a
-    parseField key parser = case Map.lookup key fields of
-      Just value -> case parseOnly (parser <* endOfInput) value of
-        Right parsed -> return parsed
-        _ -> Nothing
-      _ -> Nothing
-
 valid :: FieldSet -> Bool
-valid = isJust . parseFields passportP
+valid = isJust . parseStruct passportP

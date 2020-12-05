@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b60ba11b5bf5b941e0ed62e0825cfca9f3ab5256f5d14aa1d0f4f65c25754417
+-- hash: 569505c09a7d97dea11c7c22270c09f8c6acda0c94bfa49b76c4fd5c019d8d45
 
 name:           aoc2020
 version:        0.1.0.0
@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Data.Cell
+      Generic
       Import
       P01
       P02
@@ -35,11 +36,12 @@ library
       Paths_aoc2020
   hs-source-dirs:
       src
-  default-extensions: DeriveGeneric FlexibleInstances LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings RecordWildCards StandaloneDeriving TypeFamilies TypeSynonymInstances
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings PolyKinds RecordWildCards ScopedTypeVariables StandaloneDeriving TypeFamilies TypeOperators TypeSynonymInstances
   ghc-options: -O2 -Wall -fno-warn-deprecations -fno-warn-unused-do-bind
   build-depends:
       attoparsec
     , base >=4.7 && <5
+    , bytestring
     , containers
     , lens
     , protolude
@@ -52,12 +54,13 @@ executable main
       Paths_aoc2020
   hs-source-dirs:
       app
-  default-extensions: DeriveGeneric FlexibleInstances LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings RecordWildCards StandaloneDeriving TypeFamilies TypeSynonymInstances
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings PolyKinds RecordWildCards ScopedTypeVariables StandaloneDeriving TypeFamilies TypeOperators TypeSynonymInstances
   ghc-options: -O2 -Wall -fno-warn-deprecations -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aoc2020
     , attoparsec
     , base >=4.7 && <5
+    , bytestring
     , containers
     , lens
     , protolude
@@ -69,6 +72,7 @@ test-suite test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      GenericSpec
       P01Spec
       P02Spec
       P04Spec
@@ -76,12 +80,13 @@ test-suite test
       Paths_aoc2020
   hs-source-dirs:
       test
-  default-extensions: DeriveGeneric FlexibleInstances LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings RecordWildCards StandaloneDeriving TypeFamilies TypeSynonymInstances QuasiQuotes
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings PolyKinds RecordWildCards ScopedTypeVariables StandaloneDeriving TypeFamilies TypeOperators TypeSynonymInstances QuasiQuotes
   ghc-options: -O2 -Wall -fno-warn-deprecations -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aoc2020
     , attoparsec
     , base >=4.7 && <5
+    , bytestring
     , containers
     , heredoc
     , hspec
