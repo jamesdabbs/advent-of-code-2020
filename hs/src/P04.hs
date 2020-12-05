@@ -107,7 +107,7 @@ heightP = centimeters <|> inches
 hexColorP :: Parser HexColor
 hexColorP = do
   "#"
-  digits <- count 6 $ satisfy $ inClass "a-z0-9"
+  digits <- count 6 $ satisfy $ inClass "a-f0-9"
   return $ HexColor $ Text.pack digits
 
 eyeColorP :: Parser EyeColor
