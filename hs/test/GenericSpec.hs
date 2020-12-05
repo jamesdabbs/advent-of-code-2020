@@ -72,3 +72,10 @@ spec = do
           parsed = struct $ Map.fromList [("foo", "a"), ("bar", "b")]
 
       parsed `shouldBe` Just (Demo {foo = "a", bar = "b"})
+
+  describe "validate" $ do
+    it "passes if all right" $
+      validate (Demo (Right 1) (Right "a")) `shouldBe` Right (Demo 1 "a")
+
+    it "gathers errors" $
+      validate (Demo (Left "first") (Left "second")) `shouldBe` Left (Map.fromList [("foo", "first"), ("bar", "second")])

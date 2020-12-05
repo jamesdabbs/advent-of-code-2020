@@ -5,6 +5,7 @@ module Generic
     parse,
     parseStruct,
     struct,
+    validate,
   )
 where
 
@@ -102,6 +103,42 @@ instance (GStruct i) => GStruct (D1 b i) where
 
 instance (GStruct i) => GStruct (C1 b i) where
   gstruct fs = M1 <$> gstruct fs
+
+{- validate allows us to collapse a struct-of-eithers into a collection of
+   tagged error messages if there are any, or a struct-of-rights if not.
+-}
+validate ::
+  ( GValidate (Rep (f (Either String))) (Rep (f Identity)),
+    Generic (f (Either String)),
+    Generic (f Identity)
+  ) =>
+  f (Either String) ->
+  Either Messages (f Identity)
+validate i = to <$> gvalidate (from i)
+
+type Messages = Map String String
+
+class GValidate i o where
+  gvalidate :: i x -> Either Messages (o x)
+
+instance Selector s => GValidate (S1 s (Rec0 (Either String a))) (S1 s (Rec0 a)) where
+  gvalidate (M1 (K1 (Right x))) = Right $ M1 $ K1 x
+  gvalidate (M1 (K1 (Left s))) = Left $ Map.singleton label s
+    where
+      label = selName (undefined :: S1 s (Rec0 (Either String a)) ())
+
+instance (GValidate i o) => GValidate (D1 a i) (D1 a' o) where
+  gvalidate (M1 x) = M1 <$> gvalidate x
+
+instance (GValidate i o) => GValidate (C1 a i) (C1 a' o) where
+  gvalidate (M1 x) = M1 <$> gvalidate x
+
+instance (GValidate i o, GValidate i' o') => GValidate (i :*: i') (o :*: o') where
+  gvalidate (i :*: i') = case (gvalidate i, gvalidate i') of
+    (Right o, Right o') -> Right (o :*: o')
+    (Left s, Left s') -> Left (s <> s')
+    (Left s, _) -> Left s
+    (_, Left s') -> Left s'
 
 {- parse gives us a generic means of applying a struct-of-parsers to a similar
    struct-of-inputs to get a struct-of-results
