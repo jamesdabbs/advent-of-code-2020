@@ -81,11 +81,11 @@ parseStruct :: ( Generic (f Parser)
                , Generic (f Identity)
                , GParse (Rep (f Parser)) (Rep (f Identity))
                )
-            => f Parser -> Map Text Text -> Maybe (f Identity)
+            => f Parser -> Map Text Text -> Either String (f Identity)
 parseStruct parser = fmap to . gparse (from parser)
 
 class GParse i o where
-  gparse :: i p -> Map Text Text -> Maybe (o p)
+  gparse :: i p -> Map Text Text -> Either String (o p)
 
 instance (GParse i o, GParse i' o') => GParse (i :*: i') (o :*: o') where
   gparse (l :*: r) fs = (:*:) <$> gparse l fs <*> gparse r fs
@@ -105,9 +105,9 @@ instance Selector s => GParse (S1 s (K1 a (Parser p))) (S1 s (K1 a p)) where
     where
       label = selName (undefined :: S1 s (K1 a (Parser p)) ())
 
-runParser :: Parser p -> String -> Map Text Text -> Maybe p
+runParser :: Parser p -> String -> Map Text Text -> Either String p
 runParser parser key fs =
-  either (const Nothing) Just
+  either (const $ Left key) Right
   $ parseOnly (parser <* endOfInput)
   $ maybe "" identity
   $ Map.lookup (Text.pack key) fs

@@ -111,4 +111,4 @@ hexColorP = do
   return $ HexColor $ Text.pack digits
 
 valid :: FieldSet -> Bool
-valid = isJust . parseStruct passportP
+valid = isRight . parseStruct passportP
