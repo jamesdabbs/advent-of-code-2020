@@ -89,11 +89,14 @@ class GStruct o where
   gstruct :: Map Text Text -> Either Messages (o p)
 
 instance Selector s => GStruct (S1 s (Rec0 (Const Text a))) where
-  gstruct fs =
-    maybe
-      (Left $ Map.singleton label "not found")
-      (Right . M1 . K1 . Const)
-      $ Map.lookup (Text.pack label) fs
+  gstruct fs = case Map.lookup (Text.pack label) fs of
+    Just value -> Right $ M1 $ K1 $ Const value
+    _ -> Left $ Map.singleton label "not found"
+    where
+      label = selName (undefined :: S1 s (Rec0 Text) ())
+
+instance Selector s => GStruct (S1 s (Rec0 (Maybe (Const Text a)))) where
+  gstruct fs = Right . M1 . K1 $ Const <$> Map.lookup (Text.pack label) fs
     where
       label = selName (undefined :: S1 s (Rec0 Text) ())
 
@@ -131,6 +134,13 @@ instance Selector s => GValidate (S1 s (Rec0 (Either String a))) (S1 s (Rec0 a))
     where
       label = selName (undefined :: S1 s (Rec0 (Either String a)) ())
 
+instance Selector s => GValidate (S1 s (Rec0 (Maybe (Either String a)))) (S1 s (Rec0 (Maybe a))) where
+  gvalidate (M1 (K1 Nothing)) = Right $ M1 $ K1 Nothing
+  gvalidate (M1 (K1 (Just (Right x)))) = Right $ M1 $ K1 $ Just x
+  gvalidate (M1 (K1 (Just (Left s)))) = Left $ Map.singleton label s
+    where
+      label = selName (undefined :: S1 s (Rec0 (Either String a)) ())
+
 instance (GValidate i o) => GValidate (D1 a i) (D1 a' o) where
   gvalidate (M1 x) = M1 <$> gvalidate x
 
@@ -163,6 +173,10 @@ class GParse p i o where
 
 instance GParse (Rec0 (Parser a)) (Rec0 (Const Text a)) (Rec0 (Either String a)) where
   gparse (K1 parser) (K1 (Const input)) = K1 $ run parser input
+
+instance GParse (Rec0 (Maybe (Parser a))) (Rec0 (Maybe (Const Text a))) (Rec0 (Maybe (Either String a))) where
+  gparse (K1 (Just parser)) (K1 (Just (Const input))) = K1 $ Just $ run parser input
+  gparse _ _ = K1 Nothing
 
 instance (GParse p i o) => GParse (M1 a b p) (M1 a' b' i) (M1 a'' b'' o) where
   gparse (M1 p) (M1 i) = M1 $ gparse p i

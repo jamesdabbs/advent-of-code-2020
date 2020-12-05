@@ -1,5 +1,6 @@
 module P04Spec where
 
+import Generic (parseStruct)
 import P04
 import SpecImport
 import Text.Heredoc (str)
@@ -47,7 +48,7 @@ spec = parallel $ do
 
     map valid input `shouldBe` [False, False, False, False]
 
-  it "finds valid passports" $ do
+  describe "valid passports" $ do
     let Right input =
           parseOnly
             inputP
@@ -65,4 +66,14 @@ spec = parallel $ do
               |iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719
               |]
 
-    map valid input `shouldBe` [True, True, True, True]
+        passports :: [Passport]
+        passports = map (fromRight undefined . parseStruct passportP) input
+
+    it "marks all valid" $
+      map valid input `shouldBe` [True, True, True, True]
+
+    it "finds the expected iyrs" $
+      map iyr passports `shouldBe` [2012, 2014, 2015, 2010]
+
+    it "finds the expected cids" $
+      map cid passports `shouldBe` [Nothing, Just "129", Just "88", Nothing]

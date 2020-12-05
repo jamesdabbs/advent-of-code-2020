@@ -1,12 +1,11 @@
 module P04 where
 
+import Data.Attoparsec.Text (count, satisfy, takeText, takeTill, takeWhile)
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+import qualified Data.Text as Text
+import Generic (HKD, enumParser, fields, parseStruct)
 import Import hiding (pass, takeWhile)
-
-import           Data.Attoparsec.Text (count, satisfy, takeTill, takeWhile)
-import qualified Data.Map             as Map
-import qualified Data.Set             as Set
-import qualified Data.Text            as Text
-import           Generic              (HKD, enumParser, fields, parseStruct)
 
 -- A group of key:value pairs which _may_ represent a valid passport
 type FieldSet = Map Text Text
@@ -18,14 +17,16 @@ type FieldSet = Map Text Text
 -- See https://reasonablypolymorphic.com/blog/higher-kinded-data for a great
 -- writeup of this technique.
 data Passport' a = Passport
-  { byr :: HKD a Int
-  , iyr :: HKD a Int
-  , eyr :: HKD a Int
-  , hgt :: HKD a Height
-  , hcl :: HKD a HexColor
-  , ecl :: HKD a EyeColor
-  , pid :: HKD a Text
-  } deriving Generic
+  { byr :: HKD a Int,
+    iyr :: HKD a Int,
+    eyr :: HKD a Int,
+    hgt :: HKD a Height,
+    hcl :: HKD a HexColor,
+    ecl :: HKD a EyeColor,
+    pid :: HKD a Text,
+    cid :: Maybe (HKD a Text)
+  }
+  deriving (Generic)
 
 data Height = HeightCm Int | HeightIn Int
   deriving (Show, Eq)
@@ -46,10 +47,13 @@ data EyeColor = Amb | Blu | Brn | Gry | Grn | Hzl | Oth
     , hcl :: HexColor
     , ecl :: EyeColor
     , pid :: Text
+    , cid :: Maybe Text
     } deriving Show
 -}
 type Passport = Passport' Identity
+
 deriving instance Show Passport
+
 deriving instance Eq Passport
 
 solve :: Text -> IO ()
@@ -71,18 +75,20 @@ inputP = passport `sepBy` "\n\n"
       return (key, value)
 
 hasRequiredKeys :: FieldSet -> Bool
-hasRequiredKeys m = fields passportP `Set.isSubsetOf` Set.fromList (Map.keys m)
+hasRequiredKeys m = all (`Map.member` m) (fields passportP `Set.difference` Set.singleton "cid")
 
 passportP :: Passport' Parser
-passportP = Passport
-  { byr = rangeP 1920 2002
-  , iyr = rangeP 2010 2020
-  , eyr = rangeP 2020 2030
-  , hgt = heightP
-  , hcl = hexColorP
-  , ecl = enumParser
-  , pid = Text.pack <$> count 9 digit
-  }
+passportP =
+  Passport
+    { byr = rangeP 1920 2002,
+      iyr = rangeP 2010 2020,
+      eyr = rangeP 2020 2030,
+      hgt = heightP,
+      hcl = hexColorP,
+      ecl = enumParser,
+      pid = Text.pack <$> count 9 digit,
+      cid = Just takeText
+    }
 
 rangeP :: Int -> Int -> Parser Int
 rangeP a b = do
