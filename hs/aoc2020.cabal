@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 569505c09a7d97dea11c7c22270c09f8c6acda0c94bfa49b76c4fd5c019d8d45
+-- hash: 0bed043aaa61866eb8f86475e4952ef9df1b40ab83fe8b3a4b08bb84a692cce8
 
 name:           aoc2020
 version:        0.1.0.0
@@ -25,7 +25,6 @@ source-repository head
 
 library
   exposed-modules:
-      Data.Cell
       Generic
       Import
       P01

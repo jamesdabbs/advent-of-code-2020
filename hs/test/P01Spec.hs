@@ -15,7 +15,7 @@ input =
   ]
 
 spec :: Spec
-spec = describe "01" $ do
+spec = parallel $ do
   it "can find pairs" $ do
     findSum 2 input `shouldBe` Just [1721, 299]
 

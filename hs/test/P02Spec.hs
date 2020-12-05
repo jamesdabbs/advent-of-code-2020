@@ -15,7 +15,7 @@ matches :: Strategy -> [(Policy, Password)] -> [Char]
 matches strategy = map (chr . fst) . filter (uncurry strategy)
 
 spec :: Spec
-spec = describe "02" $ do
+spec = parallel $ do
   it "can apply the first strategy" $ do
     matches valid input `shouldBe` "ac"
 

@@ -1,8 +1,7 @@
 module P03 where
 
-import Import
-
 import qualified Data.Map as Map
+import Import
 
 solve :: Text -> IO ()
 solve input = do
@@ -17,8 +16,8 @@ solve input = do
 wrappedLookup :: [(Int, Int, a)] -> Int -> Int -> Maybe a
 wrappedLookup tiles x y = Map.lookup (x `mod` xmax, y) index
   where
-    index = Map.fromList [((x,y),c) | (x,y,c) <- tiles]
-    xmax  = maximum [x | (x,_,_) <- tiles] + 1
+    index = Map.fromList [((a, b), c) | (a, b, c) <- tiles]
+    xmax = maximum [a | (a, _, _) <- tiles] + 1
 
 path :: (Int -> Int -> Maybe a) -> Int -> Int -> [a]
 path atlas over down = loop 0 0 []
