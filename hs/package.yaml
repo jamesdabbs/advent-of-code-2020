@@ -46,7 +46,7 @@ default-extensions:
 ghc-options:
 - -O2
 - -Wall
-# - -Werror
+- -Werror
 - -fno-warn-deprecations
 - -fno-warn-unused-do-bind
 
