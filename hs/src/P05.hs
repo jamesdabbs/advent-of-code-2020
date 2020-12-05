@@ -1,8 +1,8 @@
 module P05 where
 
-import Import
-import Data.Text (unpack)
 import qualified Data.Set as Set
+import Data.Text (unpack)
+import Import hiding (cast)
 
 solve :: Text -> IO ()
 solve input = do
@@ -11,22 +11,18 @@ solve input = do
   print $ leastMissing ids -- 739
 
 seatId :: String -> Int
-seatId str =
-  let (row, col) = locate str
-  in row * 8 + col
+seatId = uncurry ((+) . (8 *)) . locate
 
+-- ex. BFFFBBFRRR ~> (0b1000110, 0b111) ~> (70, 7)
 locate :: String -> (Int, Int)
-locate directions = go directions 0 127 0 7
-  where
-    go [] row _ col _ = (row, col)
-    go (a:as) t b l r = case a of
-      'F' -> go as t (avg t b) l r
-      'B' -> go as (avg t b) b l r
-      'L' -> go as t b l (avg l r)
-      'R' -> go as t b (avg l r) r
-      _ -> go as t b l r
+locate s = (cast $ take 7 s, cast $ take 3 $ drop 7 s)
 
-    avg a b = (a + b + 1) `div` 2
+cast :: String -> Int
+cast = foldl' (\acc x -> acc * 2 + score x) 0
+  where
+    score 'B' = 1
+    score 'R' = 1
+    score _ = 0
 
 leastMissing :: Set Int -> Int
 leastMissing s = go (Set.findMin s) s
