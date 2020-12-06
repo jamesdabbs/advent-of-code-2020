@@ -5,6 +5,7 @@ module Import
   )
 where
 
+import Control.Arrow as X ((***), (>>>))
 import Control.Lens ((+=), (.=), _1, _2)
 import Data.Attoparsec.Text (Parser, atEnd, endOfLine, many', many1', notChar, parseOnly)
 import Data.Attoparsec.Text as X (Parser, choice, decimal, digit, endOfInput, inClass, parseOnly, sepBy, string)
