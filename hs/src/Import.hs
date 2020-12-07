@@ -2,6 +2,7 @@ module Import
   ( module X,
     grid,
     parse,
+    sepBy1,
   )
 where
 
@@ -36,3 +37,10 @@ grid = evalStateT cells (0, 0)
       (x, y) <- get
       _1 += 1
       return (x, y, c)
+
+-- A slight variant of the existing `sepBy1` that returns a `NonEmpty` list
+sepBy1 :: (Monad f, Alternative f) => f a -> f s -> f (NonEmpty a)
+sepBy1 parser delimiter = do
+  a <- parser
+  as <- many (delimiter *> parser)
+  return $ a :| as
