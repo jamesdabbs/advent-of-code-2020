@@ -17,7 +17,7 @@ type Strategy = Policy -> Password -> Bool
 
 solve :: Text -> IO ()
 solve input = do
-  entries <- parse input parser
+  entries <- parse parser input
 
   print $ length $ filter (uncurry valid) entries -- 600
   print $ length $ filter (uncurry revalid) entries -- 245

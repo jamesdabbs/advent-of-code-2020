@@ -27,9 +27,9 @@ dark violet bags contain no other bags.
 |]
 
 spec :: Spec
-spec = do
-  let Right i1 = parseOnly parser ex1
-      Right i2 = parseOnly parser ex2
+spec = parallel $ do
+  let i1 = parseRight parser ex1
+      i2 = parseRight parser ex2
 
   describe "part 1" $ do
     it "ex1" $

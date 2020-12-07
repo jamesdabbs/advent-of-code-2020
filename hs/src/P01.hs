@@ -5,7 +5,7 @@ import Import
 
 solve :: Text -> IO ()
 solve input = do
-  numbers <- parse input $ decimal `sepBy` "\n"
+  numbers <- parse (decimal `sepBy` "\n") input
 
   print $ product $ fromJust $ findSum 2 numbers -- 73371
   print $ product $ fromJust $ findSum 3 numbers -- 127642310

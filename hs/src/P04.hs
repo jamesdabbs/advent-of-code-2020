@@ -58,7 +58,7 @@ deriving instance Eq Passport
 
 solve :: Text -> IO ()
 solve input = do
-  fieldsets <- parse input inputP
+  fieldsets <- parse inputP input
 
   print $ length $ filter hasRequiredKeys fieldsets -- 242
   print $ length $ filter valid fieldsets -- 186

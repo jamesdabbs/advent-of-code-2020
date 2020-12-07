@@ -21,8 +21,8 @@ a
 b|]
 
 spec :: Spec
-spec = do
-  let (Right input) = parseOnly parser ex
+spec = parallel $ do
+  let input = parseRight parser ex
 
   it "parses groups" $
     length input `shouldBe` 5

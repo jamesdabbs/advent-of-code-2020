@@ -5,7 +5,7 @@ import Import
 
 solve :: Text -> IO ()
 solve input = do
-  tiles <- parse input grid
+  tiles <- parse grid input
 
   let atlas = wrappedLookup tiles
       grade (over, down) = length $ filter (== '#') $ path atlas over down

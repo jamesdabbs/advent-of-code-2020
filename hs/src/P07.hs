@@ -11,7 +11,7 @@ type Rule = (Text, [(Int, Text)])
 
 solve :: Text -> IO ()
 solve input = do
-  rules <- parse input parser
+  rules <- parse parser input
 
   print $ Set.size $ containers rules "shiny gold" -- 121
   print $ size rules "shiny gold" -- 3805

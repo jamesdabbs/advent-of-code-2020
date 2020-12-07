@@ -3,7 +3,7 @@ module GenericSpec where
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Generic
-import SpecImport
+import SpecImport hiding (parse)
 
 data Demo' f = Demo
   { foo :: HKD f Int,

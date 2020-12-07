@@ -9,7 +9,7 @@ type Group = NonEmpty (Set Char)
 
 solve :: Text -> IO ()
 solve input = do
-  groups <- parse input parser
+  groups <- parse parser input
 
   print $ sum $ map anyAnswered groups
   print $ sum $ map allAnswered groups

@@ -8,16 +8,16 @@ where
 
 import Control.Arrow as X ((***), (>>>))
 import Control.Lens ((+=), (.=), _1, _2)
+import Control.Monad.Fail (MonadFail(fail))
 import Data.Attoparsec.Text (Parser, atEnd, endOfInput, endOfLine, many', many1', notChar, parseOnly)
 import Data.Attoparsec.Text as X (Parser, choice, decimal, digit, endOfInput, inClass, parseOnly, sepBy, string)
 import Data.Char as X (isAlpha, isSpace)
 import Data.String as X (String)
-import Data.Text (pack)
 import Protolude as X
 
-parse :: Text -> Parser a -> IO a
-parse input parser = case parseOnly (parser <* endOfInput) input of
-  Left err -> die $ "Failed to parse input: " <> pack err
+parse :: MonadFail m => Parser a -> Text -> m a
+parse parser input = case parseOnly (parser <* optional "\n" <* endOfInput) input of
+  Left err -> fail $ "Failed to parse input: " <> err
   Right val -> return val
 
 grid :: Parser [(Int, Int, Char)]

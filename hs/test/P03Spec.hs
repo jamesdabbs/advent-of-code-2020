@@ -19,7 +19,7 @@ input = [str|..##.......
 
 spec :: Spec
 spec = parallel $ do
-  let Right tiles = parseOnly grid input
-
   it "computes the expected path" $ do
+    tiles <- parse grid input
+
     path (wrappedLookup tiles) 3 1 `shouldBe` "####.##.#.."
