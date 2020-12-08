@@ -1,5 +1,4 @@
 module P07Spec where
-
 import P07
 import SpecImport
 import qualified Data.Set as Set
