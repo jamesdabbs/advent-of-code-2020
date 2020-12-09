@@ -1,37 +1,42 @@
 module P09 where
 
 import Import
+import Data.Sequence (Seq(..), (|>))
+import qualified Data.Sequence as Seq
 
 solve :: Text -> IO ()
 solve input = do
-  numbers <- parse (decimal `sepBy` "\n") input
+  numbers <- Seq.fromList <$> parse (decimal `sepBy` "\n") input
 
-  let Just n = scan 25 numbers
-  print n -- 70639851
-  print $ boundSum <$> conSum n numbers -- Just 8249240
+  let m = scanForNonSum 25 numbers
+  print m -- Just 70639851
 
-scan :: Int -> [Int] -> Maybe Int
-scan size = uncurry go . splitAt size
+  print $ fmap (uncurry (+)) $ -- Just 8249240
+    bounds =<< flip consecutiveSum numbers =<< m
+
+scanForNonSum :: Int -> Seq Int -> Maybe Int
+scanForNonSum size = uncurry go . Seq.splitAt size
   where
-    go pre@(_:ps) (a:as) = if a `elem` [ x + y | x <- pre, y <- pre]
-      then go (ps <> [a]) as
+    -- TODO: we can certainly get better asymptotics than this, but the constants
+    --       here are relatively small. Benchmark _then_ optimize.
+    go pre@(_ :<| ps) (a :<| as) = if a `elem` liftA2 (+) pre pre
+      then go (ps |> a) as
       else Just a
     go _ _ = Nothing
 
-boundSum :: [Int] -> Int
-boundSum ns = minimum ns + maximum ns
+bounds :: Seq Int -> Maybe (Int, Int)
+bounds Empty = Nothing
+bounds (a :<| as) = Just $ foldr (\n -> min n *** max n) (a, a) as
 
-conSum :: Int -> [Int] -> Maybe [Int]
-conSum _ [] = Nothing
-conSum target l@(_:ns) = case takeSum target l of
-  Just s -> Just s
-  Nothing -> conSum target ns
+consecutiveSum :: Int -> Seq Int -> Maybe (Seq Int)
+consecutiveSum _ Empty = Nothing
+consecutiveSum target s@(_ :<| ns) = takeSum target s <|> consecutiveSum target ns
 
-takeSum :: Int -> [Int] -> Maybe [Int]
-takeSum target = go [] 0
+takeSum :: Int -> Seq Int -> Maybe (Seq Int)
+takeSum target = go Seq.empty 0
   where
-    go :: [Int] -> Int -> [Int] -> Maybe [Int]
-    go _ _ [] = Nothing
-    go acc total (n : ns)
-      | total + n == target = Just (acc <> [n])
-      | otherwise = go (acc <> [n]) (total + n) ns
+    go _ _ Empty = Nothing
+    go acc total (n :<| ns) = case compare total target of
+      LT -> go (acc |> n) (total + n) ns
+      EQ -> Just acc
+      GT -> Nothing -- Assuming non-negative integers, we can bail once we're over the target
