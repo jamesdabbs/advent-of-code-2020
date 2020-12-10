@@ -17,7 +17,7 @@ input =
 spec :: Spec
 spec = parallel $ do
   it "can find pairs" $ do
-    findSum 2 input `shouldBe` Just [1721, 299]
+    findPair 2020 input `shouldBe` Just [299, 1721]
 
   it "can find triples" $ do
-    findSum 3 input `shouldBe` Just [979, 366, 675]
+    findTriple 2020 input `shouldBe` Just [979, 675, 366]
