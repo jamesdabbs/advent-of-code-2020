@@ -1,4 +1,4 @@
-[![ci](https://github.com/jamesdabbs/advent-of-code-2020/workflows/hs/badge.svg)]](https://github.com/jamesdabbs/advent-of-code-2020/actions?query=workflow%3Ahs)
+[![ci](https://github.com/jamesdabbs/advent-of-code-2020/workflows/hs/badge.svg)](https://github.com/jamesdabbs/advent-of-code-2020/actions?query=workflow%3Ahs)
 [![codecov](https://codecov.io/gh/jamesdabbs/advent-of-code-2020/branch/main/graph/badge.svg?token=8U4K1HOI01)](https://codecov.io/gh/jamesdabbs/advent-of-code-2020)
 [![Docker Repository on Quay](https://quay.io/repository/jamesdabbs/advent-of-code-2020/status "Docker Repository on Quay")](https://quay.io/repository/jamesdabbs/advent-of-code-2020)
 
