@@ -11,8 +11,8 @@ solution = solve grid $ \tiles -> do
   part1 $ grade (3, 1) -- 276
   part2 $ product $ map grade [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)] -- 7812180000
 
-wrappedLookup :: [(Int, Int, a)] -> Int -> Int -> Maybe a
-wrappedLookup tiles x y = Map.lookup (x `mod` xmax, y) index
+wrappedLookup :: Grid a -> Int -> Int -> Maybe a
+wrappedLookup tiles = \x y -> Map.lookup (x `mod` xmax, y) index
   where
     index = Map.fromList [((a, b), c) | (a, b, c) <- tiles]
     xmax = maximum [a | (a, _, _) <- tiles] + 1
