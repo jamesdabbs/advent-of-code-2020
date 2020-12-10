@@ -56,12 +56,10 @@ deriving instance Show Passport
 
 deriving instance Eq Passport
 
-solve :: Text -> IO ()
-solve input = do
-  fieldsets <- parse inputP input
-
-  print $ length $ filter hasRequiredKeys fieldsets -- 242
-  print $ length $ filter valid fieldsets -- 186
+solution :: Solution [FieldSet]
+solution = solve inputP $ \fieldsets -> do
+  part1 $ length $ filter hasRequiredKeys fieldsets -- 242
+  part2 $ length $ filter valid fieldsets -- 186
 
 inputP :: Parser [FieldSet]
 inputP = passport `sepBy` "\n\n"

@@ -1,62 +1,51 @@
-name:                aoc2020
+name:                santa
 version:             0.1.0.0
-github:              "jamesdabbs/advent-of-code-2020"
+github:              jamesdabbs/santa
 license:             BSD3
-author:              "James Dabbs"
-maintainer:          "james.dabbs@gmail.com"
-copyright:           "2020 James Dabbs"
+author:              James Dabbs
+maintainer:          james.dabbs@gmail.com
+copyright:           2020 James Dabbs
 
 extra-source-files:
 - README.md
 
-# Metadata used when publishing your package
-# synopsis:            Short description of your package
+synopsis:            An Advent driver
 # category:            Web
 
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/jamesdabbs/advent-of-code-2020>
+description:         Please see the README on GitHub at <https://github.com/jamesdabbs/santa#readme>
 
 dependencies:
 - base >= 4.7 && < 5
 - attoparsec
-- bytestring
 - containers
+- criterion
+- either
+- filepath
 - lens
 - mtl
+- optparse-applicative
 - protolude
-- santa
 - text
 
 default-extensions:
 - DeriveGeneric
-- FlexibleContexts
-- FlexibleInstances
+- GeneralizedNewtypeDeriving
 - LambdaCase
-- MultiParamTypeClasses
-- NamedFieldPuns
 - NoImplicitPrelude
 - OverloadedStrings
-- PolyKinds
-- RecordWildCards
-- ScopedTypeVariables
-- StandaloneDeriving
-- TypeFamilies
-- TypeOperators
-- TypeSynonymInstances
+
 ghc-options:
-- -O2
 - -Wall
 - -Werror
-- -fno-warn-deprecations
-- -fno-warn-unused-do-bind
 
 library:
   source-dirs: src
 
 executables:
-  aoc:
+  santa-discover:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -64,10 +53,11 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - aoc2020
+    - santa
+    - directory
 
 tests:
-  test:
+  santa-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -75,12 +65,5 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - aoc2020
-    - heredoc
+    - santa
     - hspec
-    - unix
-    default-extensions:
-    - QuasiQuotes
-
-build-tools:
-- hpc-lcov

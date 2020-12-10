@@ -15,12 +15,10 @@ type Password = Text
 
 type Strategy = Policy -> Password -> Bool
 
-solve :: Text -> IO ()
-solve input = do
-  entries <- parse parser input
-
-  print $ length $ filter (uncurry valid) entries -- 600
-  print $ length $ filter (uncurry revalid) entries -- 245
+solution :: Solution [(Policy, Password)]
+solution = solve parser $ \entries -> do
+  part1 $ length $ filter (uncurry valid) entries -- 600
+  part2 $ length $ filter (uncurry revalid) entries -- 245
 
 parser :: Parser [(Policy, Password)]
 parser = line `sepBy` "\n"

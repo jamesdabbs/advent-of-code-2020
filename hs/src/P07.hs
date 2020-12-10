@@ -1,20 +1,18 @@
 module P07 where
 
-import Import hiding (takeWhile)
+import Control.Lens (at, (%=))
 import Data.Attoparsec.Text (anyChar, manyTill)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
-import Control.Lens ( (%=), at )
+import Import hiding (takeWhile)
 
 type Rule = (Text, [(Int, Text)])
 
-solve :: Text -> IO ()
-solve input = do
-  rules <- parse parser input
-
-  print $ Set.size $ containers rules "shiny gold" -- 121
-  print $ size rules "shiny gold" -- 3805
+solution :: Solution [Rule]
+solution = solve parser $ \rules -> do
+  part1 $ Set.size $ containers rules "shiny gold" -- 121
+  part2 $ size rules "shiny gold" -- 3805
 
 containers :: [Rule] -> Text -> Set Text
 containers rules = expand Set.empty . parents
@@ -27,7 +25,7 @@ containers rules = expand Set.empty . parents
 
     parents bag = Map.findWithDefault [] bag index
 
-    expand seen (a:as)
+    expand seen (a : as)
       | a `Set.member` seen = expand seen as
       | otherwise = expand (a `Set.insert` seen) (parents a <> as)
     expand seen _ = seen
@@ -45,12 +43,14 @@ parser = line `sepBy` "\n"
   where
     bag = Text.pack <$> manyTill anyChar " bag"
 
-    line = (,)
-      <$> bag <* "s contain "
-      <*> (nothing <|> (content `sepBy` ", ")) <* "."
+    line =
+      (,)
+        <$> bag <* "s contain "
+        <*> (nothing <|> (content `sepBy` ", ")) <* "."
 
-    content = (,)
-      <$> decimal <* " "
-      <*> bag <* optional "s"
+    content =
+      (,)
+        <$> decimal <* " "
+        <*> bag <* optional "s"
 
     nothing = "no other bags" $> []

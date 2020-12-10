@@ -1,9 +1,9 @@
 module P08 where
 
-import Import
 import Data.Attoparsec.Text (signed)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
+import Import
 
 data Instruction
   = Nop Int
@@ -12,20 +12,19 @@ data Instruction
   deriving (Show, Eq, Ord)
 
 data Cpu = Cpu
-  { pc  :: Int
-  , acc :: Int
-  } deriving (Show)
+  { pc :: Int,
+    acc :: Int
+  }
+  deriving (Show)
 
 type ROM = Map Int Instruction
 
 data Exit = Halt Int | Loop Int deriving (Show, Eq)
 
-solve :: Text -> IO ()
-solve input = do
-  instructions <- parse parser input
-
-  print $ run instructions -- Loop 1475
-  print $ findHaltingVariant instructions -- Just 1270
+solution :: Solution ROM
+solution = solve parser $ \rom -> do
+  part1 $ run rom -- Loop 1475
+  part2 $ findHaltingVariant rom -- Just 1270
 
 step :: Instruction -> Cpu -> Cpu
 step (Nop _) (Cpu pc acc) = Cpu (pc + 1) acc
@@ -39,9 +38,9 @@ run rom = go (Set.singleton 0) (Cpu 0 0)
       Nothing -> Halt $ acc cpu
       Just instruction ->
         let next = step instruction cpu
-        in if pc next `Set.member` seen
-          then Loop $ acc cpu
-          else go (pc next `Set.insert` seen) next
+         in if pc next `Set.member` seen
+              then Loop $ acc cpu
+              else go (pc next `Set.insert` seen) next
 
 mutate :: Instruction -> Instruction
 mutate (Acc x) = Acc x
@@ -64,8 +63,9 @@ findHaltingVariant = head . mapMaybe (toHalt . run) . variants
 parser :: Parser ROM
 parser = Map.fromList . zip [0 ..] <$> instruction `sepBy` "\n"
   where
-    instruction = choice
-      [ Nop <$> ("nop " *> signed decimal)
-      , Acc <$> ("acc " *> signed decimal)
-      , Jmp <$> ("jmp " *> signed decimal)
-      ]
+    instruction =
+      choice
+        [ Nop <$> ("nop " *> signed decimal),
+          Acc <$> ("acc " *> signed decimal),
+          Jmp <$> ("jmp " *> signed decimal)
+        ]

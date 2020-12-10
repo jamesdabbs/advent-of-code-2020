@@ -3,12 +3,10 @@ module P01 where
 import Data.Maybe (fromJust)
 import Import
 
-solve :: Text -> IO ()
-solve input = do
-  numbers <- parse (decimal `sepBy` "\n") input
-
-  print $ product $ fromJust $ findSum 2 numbers -- 73371
-  print $ product $ fromJust $ findSum 3 numbers -- 127642310
+solution :: Solution [Int]
+solution = solve (decimal `sepBy` "\n") $ \numbers -> do
+  part1 $ product $ fromJust $ findSum 2 numbers -- 73371
+  part2 $ product $ fromJust $ findSum 3 numbers -- 127642310
 
 findSum :: Int -> [Int] -> Maybe [Int]
 findSum ofSize = find ((== 2020) . sum) . tuples ofSize
