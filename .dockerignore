@@ -1,0 +1,6 @@
+node_modules
+ts
+.git
+hs/.stack-work
+hs/bench
+hs/dist-newstyle

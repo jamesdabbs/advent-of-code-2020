@@ -8,19 +8,21 @@ where
 
 import Control.Arrow as X ((***), (>>>))
 import Control.Lens ((+=), (.=), _1, _2)
-import Control.Monad.Fail (MonadFail(fail))
+import Control.Monad.Fail (MonadFail (fail))
 import Data.Attoparsec.Text (Parser, atEnd, endOfInput, endOfLine, many', many1', notChar, parseOnly)
 import Data.Attoparsec.Text as X (Parser, choice, decimal, digit, endOfInput, inClass, parseOnly, sepBy, string)
 import Data.Char as X (isAlpha, isSpace)
+import Data.Grid as X (Grid)
 import Data.String as X (String)
 import Protolude as X
+import Santa.Solution as X (Solution, part1, part2, solve)
 
 parse :: MonadFail m => Parser a -> Text -> m a
 parse parser input = case parseOnly (parser <* optional "\n" <* endOfInput) input of
   Left err -> fail $ "Failed to parse input: " <> err
   Right val -> return val
 
-grid :: Parser [(Int, Int, Char)]
+grid :: Parser (Grid Char)
 grid = evalStateT cells (0, 0)
   where
     cells = join <$> many' row

@@ -1,0 +1,7 @@
+cradle:
+  stack:
+    - path: ./src
+      component: santa:lib
+
+    - path: ./test
+      component: santa:test:santa-test

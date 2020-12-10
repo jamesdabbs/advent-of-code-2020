@@ -1,3 +1,7 @@
+[![ci](https://github.com/jamesdabbs/advent-of-code-2020/workflows/hs/badge.svg)]](https://github.com/jamesdabbs/advent-of-code-2020/actions?query=workflow%3Ahs)
+[![codecov](https://codecov.io/gh/jamesdabbs/advent-of-code-2020/branch/main/graph/badge.svg?token=8U4K1HOI01)](https://codecov.io/gh/jamesdabbs/advent-of-code-2020)
+[![Docker Repository on Quay](https://quay.io/repository/jamesdabbs/advent-of-code-2020/status "Docker Repository on Quay")](https://quay.io/repository/jamesdabbs/advent-of-code-2020)
+
 Contains my solution to [2020 Advent of Code](https://adventofcode.com/2020) problems, in several languages.
 
 * [Haskell](https://github.com/jamesdabbs/advent-of-code-2020/tree/main/hs)

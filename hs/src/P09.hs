@@ -4,15 +4,17 @@ import Import
 import Data.Sequence (Seq(..), (|>))
 import qualified Data.Sequence as Seq
 
-solve :: Text -> IO ()
-solve input = do
-  numbers <- Seq.fromList <$> parse (decimal `sepBy` "\n") input
 
+solution :: Solution (Seq Int)
+solution = solve parser $ \numbers -> do
   let m = scanForNonSum 25 numbers
-  print m -- Just 70639851
+  part1 m -- Just 70639851
 
-  print $ fmap (uncurry (+)) $ -- Just 8249240
+  part2 $ fmap (uncurry (+)) $ -- Just 8249240
     bounds =<< flip consecutiveSum numbers =<< m
+
+parser :: Parser (Seq Int)
+parser = Seq.fromList <$> decimal `sepBy` "\n"
 
 scanForNonSum :: Int -> Seq Int -> Maybe Int
 scanForNonSum size = uncurry go . Seq.splitAt size

@@ -1,15 +1,15 @@
 module P05 where
 
 import Control.Arrow (first)
+import Data.Attoparsec.Text (takeWhile)
 import qualified Data.Set as Set
 import Data.Text (unpack)
-import Import hiding (cast, first)
+import Import hiding (cast, first, takeWhile)
 
-solve :: Text -> IO ()
-solve input = do
-  let ids = Set.fromList $ map (seatId . unpack) $ lines input
-  print $ Set.findMax ids -- 864
-  print $ leastMissing ids -- 739
+solution :: Solution (Set Int)
+solution = solve parser $ \ids -> do
+  part1 $ Set.findMax ids -- 864
+  part2 $ leastMissing ids -- 739
 
 seatId :: String -> Int
 seatId = locate >>> first (* 8) >>> uncurry (+)
@@ -25,3 +25,6 @@ leastMissing :: Set Int -> Int
 leastMissing s = go (Set.findMin s) s
   where
     go n s' = if (n + 1) `Set.member` s' then go (n + 1) s' else n + 1
+
+parser :: Parser (Set Int)
+parser = Set.fromList . map (seatId . unpack) <$> takeWhile (/= '\n') `sepBy` "\n"

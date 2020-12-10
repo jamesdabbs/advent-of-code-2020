@@ -1,18 +1,15 @@
 module P06 where
 
-import Import
-
 import Data.Attoparsec.Text (letter, many1)
 import qualified Data.Set as Set
+import Import
 
 type Group = NonEmpty (Set Char)
 
-solve :: Text -> IO ()
-solve input = do
-  groups <- parse parser input
-
-  print $ sum $ map anyAnswered groups
-  print $ sum $ map allAnswered groups
+solution :: Solution [Group]
+solution = solve parser $ \groups -> do
+  part1 $ sum $ map anyAnswered groups
+  part2 $ sum $ map allAnswered groups
 
 parser :: Parser [Group]
 parser = (line `sepBy1` "\n") `sepBy` "\n\n"

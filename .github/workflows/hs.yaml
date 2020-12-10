@@ -1,0 +1,67 @@
+name: hs
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    - cron: '12 13 * * *'
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/jamesdabbs/advent-of-code-2020
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cache stack dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            /stack
+            hs/.stack-work
+            hs/dist-newstyle
+          key: v1-${{ runner.os }}-${{ hashFiles('hs/stack.yaml') }}-${{ hashFiles('hs/package.yaml') }}
+      - name: Setup
+        run: stack setup --no-terminal
+        working-directory: ./hs
+      - name: Install
+        run: stack install --no-terminal --jobs 4
+        working-directory: ./hs
+
+      # Run tests
+      - name: Run tests
+        run: stack test --coverage --no-terminal
+        working-directory: ./hs
+
+      # Report coverage
+      - name: Extract coverage reports
+        run: |
+          cd ./hs
+          mkdir /tmp/coverage
+          cp -r $(stack --no-terminal path --local-hpc-root) /tmp/coverage
+      - name: Persist coverage
+        uses: actions/upload-artifact@v2
+        with:
+          name: benchmarks
+          path: |
+            /tmp/coverage
+      - name: Generate lcov report
+        run: stack exec hpc-lcov
+        working-directory: ./hs
+      - name: Report coverage
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./hs/lcov.info
+          fail_ci_if_error: true
+
+      # # Run benchmarks
+      - name: Run benchmarks
+        run: stack exec aoc bench
+        working-directory: ./hs
+      - uses: actions/upload-artifact@v2
+        with:
+          name: benchmarks
+          path: |
+            ./hs/bench

@@ -1,0 +1,104 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: b64907cc457c8587e6ee8c00e7841f527c09a3012164b76480913caf1eef57f3
+
+name:           santa
+version:        0.1.0.0
+synopsis:       An Advent driver
+description:    Please see the README on GitHub at <https://github.com/jamesdabbs/santa#readme>
+homepage:       https://github.com/jamesdabbs/santa#readme
+bug-reports:    https://github.com/jamesdabbs/santa/issues
+author:         James Dabbs
+maintainer:     james.dabbs@gmail.com
+copyright:      2020 James Dabbs
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/jamesdabbs/santa
+
+library
+  exposed-modules:
+      Santa
+      Santa.Main
+      Santa.Problems
+      Santa.Runner
+      Santa.Solution
+  other-modules:
+      Paths_santa
+  hs-source-dirs:
+      src
+  default-extensions: DeriveGeneric GeneralizedNewtypeDeriving LambdaCase NoImplicitPrelude OverloadedStrings
+  ghc-options: -Wall -Werror
+  build-depends:
+      attoparsec
+    , base >=4.7 && <5
+    , containers
+    , criterion
+    , either
+    , filepath
+    , lens
+    , mtl
+    , optparse-applicative
+    , protolude
+    , text
+  default-language: Haskell2010
+
+executable santa-discover
+  main-is: Main.hs
+  other-modules:
+      Paths_santa
+  hs-source-dirs:
+      app
+  default-extensions: DeriveGeneric GeneralizedNewtypeDeriving LambdaCase NoImplicitPrelude OverloadedStrings
+  ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      attoparsec
+    , base >=4.7 && <5
+    , containers
+    , criterion
+    , directory
+    , either
+    , filepath
+    , lens
+    , mtl
+    , optparse-applicative
+    , protolude
+    , santa
+    , text
+  default-language: Haskell2010
+
+test-suite santa-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      SolutionSpec
+      SpecImport
+      Paths_santa
+  hs-source-dirs:
+      test
+  default-extensions: DeriveGeneric GeneralizedNewtypeDeriving LambdaCase NoImplicitPrelude OverloadedStrings
+  ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      attoparsec
+    , base >=4.7 && <5
+    , containers
+    , criterion
+    , either
+    , filepath
+    , hspec
+    , lens
+    , mtl
+    , optparse-applicative
+    , protolude
+    , santa
+    , text
+  default-language: Haskell2010

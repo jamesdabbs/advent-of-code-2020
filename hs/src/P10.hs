@@ -3,12 +3,10 @@ module P10 where
 import Import hiding (get)
 import qualified Data.Map.Strict as Map
 
-solve :: Text -> IO ()
-solve input = do
-  numbers <- parse parser input
-
-  print $ uncurry (*) $ jolts numbers -- 2400
-  print $ arrangements numbers -- 338510590509056
+solution :: Solution [Int]
+solution = solve parser $ \numbers -> do
+  part1 $ uncurry (*) $ jolts numbers -- 2400
+  part2 $ arrangements numbers -- 338510590509056
 
 jolts :: [Int] -> (Int, Int)
 jolts adapters = (get 1 counts, get 3 counts + 1)

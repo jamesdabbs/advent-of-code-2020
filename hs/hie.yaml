@@ -1,0 +1,7 @@
+cradle:
+  stack:
+    - path: ./src
+      component: aoc2020:lib
+
+    - path: ./test
+      component: aoc2020:test:test
