@@ -21,6 +21,7 @@ spec = do
     , ("08", ("Loop 1475","Just 1270"))
     , ("09", ("Just 70639851","Just 8249240"))
     , ("10", ("2400", "338510590509056"))
+    , ("11", ("2178", "1978"))
     ] $ \(n, expected) ->
       it (Text.unpack n) $
         run problems "../inputs" n `shouldReturn` Right expected
