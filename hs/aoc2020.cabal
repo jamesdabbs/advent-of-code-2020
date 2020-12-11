@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f3aa67e153fb2d345852cb9c8de2f9b4617f82568b05375ab2245c61b4a1152a
+-- hash: 2418991e281fb4367f0a80002579dad73289349e93c15e585b87a191f1ecb458
 
 name:           aoc2020
 version:        0.1.0.0
@@ -38,6 +38,7 @@ library
       P08
       P09
       P10
+      P11
       Problems
   other-modules:
       Paths_aoc2020
@@ -97,6 +98,7 @@ test-suite test
       P08Spec
       P09Spec
       P10Spec
+      P11Spec
       RegressionSpec
       SpecImport
       Paths_aoc2020
