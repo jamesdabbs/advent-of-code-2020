@@ -4,7 +4,8 @@ import P06
 import SpecImport
 
 ex :: Text
-ex = [here|abc
+ex =
+  [here|abc
 
 a
 b
@@ -18,7 +19,8 @@ a
 a
 a
 
-b|]
+b
+|]
 
 spec :: Spec
 spec = parallel $ do

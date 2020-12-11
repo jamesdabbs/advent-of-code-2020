@@ -5,15 +5,15 @@
 # Commands
 
 ```bash
-$ stack exec aoc run            # run all solutions
-$ stack exec aoc run $n         # run solution #n
-$ stack exec aoc bench          # run all benchmarks
-$ stack exec aoc bench $n       # run benchmarks for solution #n
+$ stack exec aoc run             # run all solutions
+$ stack exec aoc run $n          # run solution #n
+$ stack exec aoc bench           # run all benchmarks
+$ stack exec aoc bench $n        # run benchmarks for solution #n
 $ stack test                     # run unit tests
 $ stack test --fast --file-watch # run unit tests, watching for changes
 $ env CI=true stack test         # run unit and regression tests
-$ stack exec aoc list           # list auto-discovered solutions
-$ stack exec aoc -- --help      # view CLI documentation
+$ stack exec aoc list            # list auto-discovered solutions
+$ stack exec aoc -- --help       # view CLI documentation
 ```
 
 ## Profiling

@@ -56,7 +56,7 @@ spec = do
   describe "parse" $
     it "applies a parser to structured input" $
       parse parser (Demo "123" "right")
-        `shouldBe` (Demo (Right 123) (Right "right"))
+        `shouldBe` Demo (Right 123) (Right "right")
 
   describe "parseStruct" $ do
     let run = parseStruct parser . Map.fromList
