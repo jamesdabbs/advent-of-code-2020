@@ -14,6 +14,8 @@ $ stack test --fast --file-watch # run unit tests, watching for changes
 $ env CI=true stack test         # run unit and regression tests
 $ stack exec aoc list            # list auto-discovered solutions
 $ stack exec aoc -- --help       # view CLI documentation
+$ stack exec aoc scaffold        # scaffold out an empty solution for the next unsolved day
+$ stack exec aoc scaffold $n     # scaffold out an empty solution #n
 ```
 
 ## Profiling

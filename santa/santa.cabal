@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b64907cc457c8587e6ee8c00e7841f527c09a3012164b76480913caf1eef57f3
+-- hash: 97643ba5106acc3e43a0bb49474884a2fa28b12ccc08fa1214948b4a3c5dc012
 
 name:           santa
 version:        0.1.0.0
@@ -31,6 +31,7 @@ library
       Santa.Main
       Santa.Problems
       Santa.Runner
+      Santa.Scaffold
       Santa.Solution
   other-modules:
       Paths_santa
