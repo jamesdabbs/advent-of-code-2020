@@ -1,3 +1,18 @@
 # quay builds are failing on Dockerhub rate limits
 # To work around that, we'll maintain a :base tag on quay to use as a base
 FROM fpco/stack-build-small
+
+RUN apt-get update && apt-get install -y curl
+
+ENV STACK_ROOT /stack
+RUN mkdir $STACK_ROOT
+
+# Install some known, stable, heavier dependencies in the base image rather than
+# on every rebuild.
+RUN stack install \
+  attoparsec \
+  criterion \
+  lens \
+  mtl \
+  protolude \
+  hspec
