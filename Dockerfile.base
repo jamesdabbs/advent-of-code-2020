@@ -1,0 +1,3 @@
+# quay builds are failing on Dockerhub rate limits
+# To work around that, we'll maintain a :base tag on quay to use as a base
+FROM fpco/stack-build-small
