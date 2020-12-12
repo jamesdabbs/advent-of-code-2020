@@ -1,6 +1,8 @@
 module Import
   ( module X,
     grid,
+    inspect,
+    inspect',
     sepBy1,
   )
 where
@@ -39,3 +41,9 @@ sepBy1 parser delimiter = do
   a <- parser
   as <- many (delimiter *> parser)
   return $ a :| as
+
+inspect :: Show a => a -> a
+inspect a = trace (show a :: Text) a
+
+inspect' :: Show a => Text -> a -> a
+inspect' label a = trace (label <> ": " <> show a) a
