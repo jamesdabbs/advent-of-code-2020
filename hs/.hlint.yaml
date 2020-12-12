@@ -1,0 +1,4 @@
+- arguments:
+  - --color
+  - --cpp-simple
+  - -XQuasiQuotes

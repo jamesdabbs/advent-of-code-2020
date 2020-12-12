@@ -83,4 +83,5 @@ tests:
     - QuasiQuotes
 
 build-tools:
+- hlint
 - hpc-lcov
