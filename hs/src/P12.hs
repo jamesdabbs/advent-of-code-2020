@@ -1,74 +1,87 @@
 module P12 where
 
-import Import hiding (rotate)
+import Import hiding (to)
 
-data Direction = N | E | S | W | L | R | F
+data Heading = N | E | S | W
   deriving (Show, Eq, Enum, Bounded)
 
-data Heading = North | East | South | West
+data Orientation = R | B | L
   deriving (Show, Eq, Enum, Bounded)
 
-type Instruction = (Direction, Int)
+data Instruction = Head Heading Int | Turn Orientation | Forward Int
+  deriving (Show, Eq)
 
-type Ship = (Int, Int, Heading)
+type Point = (Int, Int)
 
-type Ship' = ((Int, Int), (Int, Int))
+type ShipWith a = (Point, a)
+
+type Ship = ShipWith Heading
+
+type Ship' = ShipWith Point
 
 solution :: Solution [Instruction]
 solution = solve parser $ \moves -> do
-  part1 $ distance $ location $ foldl follow start moves -- 820
+  part1 $ distance $ fst $ foldl follow start moves -- 820
   part2 $ distance $ fst $ foldl follow' start' moves -- 66614
 
 follow :: Ship -> Instruction -> Ship
-follow (x, y, h) (N, d) = (x, y + d, h)
-follow (x, y, h) (E, d) = (x + d, y, h)
-follow (x, y, h) (S, d) = (x, y - d, h)
-follow (x, y, h) (W, d) = (x - d, y, h)
--- Forward
-follow (x, y, North) (F, d) = (x, y + d, North)
-follow (x, y, East) (F, d) = (x + d, y, East)
-follow (x, y, South) (F, d) = (x, y - d, South)
-follow (x, y, West) (F, d) = (x - d, y, West)
--- Turning
-follow (x, y, h) (R, d) = (x, y, applyN (d `div` 90) rotate h)
-follow s (L, d) = follow s (R, 360 - d)
+follow (ship, bearing) (Head direction n) = (translate direction n ship, bearing)
+follow (ship, bearing) (Forward n) = (translate bearing n ship, bearing)
+follow (ship, bearing) (Turn to) = (ship, turn to bearing)
 
 follow' :: Ship' -> Instruction -> Ship'
-follow' (p, (wx, wy)) (N, d) = (p, (wx, wy + d))
-follow' (p, (wx, wy)) (E, d) = (p, (wx + d, wy))
-follow' (p, (wx, wy)) (S, d) = (p, (wx, wy - d))
-follow' (p, (wx, wy)) (W, d) = (p, (wx - d, wy))
--- Forward
-follow' ((x, y), (wx, wy)) (F, d) = ((x + d * wx, y + d * wy), (wx, wy))
--- Turning
-follow' (x, w) (R, d) = (x, rotate' d w)
-follow' s (L, d) = follow' s (R, 360 - d)
+follow' (ship, w) (Head direction n) = (ship, translate direction n w)
+follow' ((x, y), (wx, wy)) (Forward n) = ((x + n * wx, y + n * wy), (wx, wy))
+follow' (ship, waypoint) (Turn to) = (ship, turn' to waypoint)
 
-start :: Ship
-start = (0, 0, East)
+translate :: Heading -> Int -> Point -> Point
+translate N d (x, y) = (x, y + d)
+translate E d (x, y) = (x + d, y)
+translate S d (x, y) = (x, y - d)
+translate W d (x, y) = (x - d, y)
 
-start' :: Ship'
+turn :: Orientation -> Heading -> Heading
+turn R N = E
+turn R E = S
+turn R S = W
+turn R W = N
+turn B N = S
+turn B E = W
+turn B S = N
+turn B W = E
+turn L N = W
+turn L E = N
+turn L S = E
+turn L W = S
+
+turn' :: Orientation -> Point -> Point
+turn' R (x, y) = (y, - x)
+turn' B (x, y) = (- x, - y)
+turn' L (x, y) = (- y, x)
+
+start :: ShipWith Heading
+start = ((0, 0), E)
+
+start' :: ShipWith Point
 start' = ((0, 0), (10, 1))
 
-rotate :: Heading -> Heading
-rotate h
-  | h == maxBound = minBound
-  | otherwise = succ h
-
-rotate' :: Int -> (Int, Int) -> (Int, Int)
-rotate' 90 (x, y) = (y, - x)
-rotate' 180 (x, y) = (- x, - y)
-rotate' 270 (x, y) = (- y, x)
-rotate' _ w = w
-
-location :: Ship -> (Int, Int)
-location (x, y, _) = (x, y)
-
-distance :: (Int, Int) -> Int
+distance :: Point -> Int
 distance (x, y) = abs x + abs y
 
 parser :: Parser [Instruction]
-parser = ((,) <$> directions <*> decimal) `sepBy` "\n"
+parser = instruction `sepBy` "\n"
   where
-    directions = choice $ map direction [minBound .. maxBound]
-    direction d = string (show d) $> d
+    instruction =
+      choice
+        [ "N" *> (Head N <$> decimal),
+          "E" *> (Head E <$> decimal),
+          "S" *> (Head S <$> decimal),
+          "W" *> (Head W <$> decimal),
+          "F" *> (Forward <$> decimal),
+          "R90" $> Turn R,
+          "R180" $> Turn B,
+          "R270" $> Turn L,
+          "L90" $> Turn L,
+          "L180" $> Turn B,
+          "L270" $> Turn R
+        ]
