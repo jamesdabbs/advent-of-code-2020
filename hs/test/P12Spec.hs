@@ -16,7 +16,7 @@ spec = parallel $ do
   let moves = parseRight parser ex
 
   it "solves part 1" $
-    foldl follow start moves `shouldBe` (17, -8, South)
+    foldl follow start moves `shouldBe` ((17, -8), S)
 
   it "solves part 2" $
     foldl follow' start' moves `shouldBe` ((214, -72), (4, -10))
