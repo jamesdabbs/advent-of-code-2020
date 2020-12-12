@@ -1,4 +1,5 @@
-FROM fpco/stack-build-small
+# See `base` branch for details
+FROM quay.io/jamesdabbs/advent-of-code-2020:base
 
 ENV STACK_ROOT /stack
 RUN mkdir $STACK_ROOT
