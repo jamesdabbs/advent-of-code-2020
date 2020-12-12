@@ -11,4 +11,4 @@ WORKDIR /build/hs
 COPY ./hs /build/hs
 COPY ./santa /build/santa
 
-RUN stack install --only-snapshot --jobs 4
+RUN stack install --only-snapshot
