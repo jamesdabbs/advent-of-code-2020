@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a80d953347aeb408abe6e8463bdab4943f6525c43f7bcfa54f6cacd2d6a64e49
+-- hash: a911188dda9e398f406409d37d65a63e02820924c9644b2846dded36687c7d14
 
 name:           aoc2020
 version:        0.1.0.0
@@ -50,7 +50,8 @@ library
   default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings PolyKinds RecordWildCards ScopedTypeVariables StandaloneDeriving TypeFamilies TypeOperators TypeSynonymInstances
   ghc-options: -O2 -Wall -Werror -fno-warn-deprecations -fno-warn-unused-do-bind
   build-tool-depends:
-      hpc-lcov:hpc-lcov
+      hlint:hlint
+    , hpc-lcov:hpc-lcov
   build-depends:
       attoparsec
     , base >=4.7 && <5
@@ -72,7 +73,8 @@ executable aoc
   default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings PolyKinds RecordWildCards ScopedTypeVariables StandaloneDeriving TypeFamilies TypeOperators TypeSynonymInstances
   ghc-options: -O2 -Wall -Werror -fno-warn-deprecations -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-tool-depends:
-      hpc-lcov:hpc-lcov
+      hlint:hlint
+    , hpc-lcov:hpc-lcov
   build-depends:
       aoc2020
     , attoparsec
@@ -113,7 +115,8 @@ test-suite test
   default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings PolyKinds RecordWildCards ScopedTypeVariables StandaloneDeriving TypeFamilies TypeOperators TypeSynonymInstances QuasiQuotes
   ghc-options: -O2 -Wall -Werror -fno-warn-deprecations -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-tool-depends:
-      hpc-lcov:hpc-lcov
+      hlint:hlint
+    , hpc-lcov:hpc-lcov
   build-depends:
       aoc2020
     , attoparsec

@@ -23,7 +23,7 @@ type Messages = Map String String
 enumParser :: (Bounded e, Enum e, Show e) => Parser e
 enumParser = choice $ map opt [minBound .. maxBound]
   where
-    opt e = string (Text.toLower $ show e) *> pure e
+    opt e = string (Text.toLower $ show e) $> e
 
 {- See https://reasonablypolymorphic.com/blog/higher-kinded-data for a great
   writeup of the sort of generic programming present in this file, and the
