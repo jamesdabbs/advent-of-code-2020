@@ -33,7 +33,7 @@ test :: Text -> Text
 test n = mconcat $ map (<> "\n")
   [ "module P" <> n <> "Spec where",
     "",
-    "import " <> n,
+    "import P" <> n,
     "import SpecImport",
     "",
     "ex :: Text",
