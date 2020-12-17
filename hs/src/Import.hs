@@ -4,6 +4,7 @@ module Import
     inspect,
     inspect',
     sepBy1,
+    tally,
   )
 where
 
@@ -13,6 +14,7 @@ import Data.Attoparsec.Text (Parser, atEnd, endOfInput, endOfLine, many', many1'
 import Data.Attoparsec.Text as X (Parser, choice, decimal, digit, endOfInput, inClass, parseOnly, sepBy, string)
 import Data.Char as X (isAlpha, isSpace)
 import Data.Grid as X (Grid)
+import qualified Data.Map as Map
 import Data.String as X (String)
 import Protolude as X
 import Santa.Solution as X (Solution, part1, part2, solve)
@@ -47,3 +49,6 @@ inspect a = trace (show a :: Text) a
 
 inspect' :: Show a => Text -> a -> a
 inspect' label a = trace (label <> ": " <> show a) a
+
+tally :: Ord a => [a] -> Map a Int
+tally = foldr (Map.alter (Just . maybe 1 (+ 1))) Map.empty

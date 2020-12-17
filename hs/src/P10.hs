@@ -1,7 +1,7 @@
 module P10 where
 
-import Import hiding (get)
 import qualified Data.Map.Strict as Map
+import Import hiding (get)
 
 solution :: Solution [Int]
 solution = solve parser $ \numbers -> do
@@ -29,15 +29,13 @@ arrangements l = get 0 $ foldr expand (Map.singleton (maximum l) 1) l
   where
     nexts a = takeWhile (<= a + 3) $ dropWhile (<= a) l
 
-    expand n m = if n `Map.member` m
-      then m
-      else Map.insert n (sum $ map (m Map.!) $ nexts n) m
+    expand n m =
+      if n `Map.member` m
+        then m
+        else Map.insert n (sum $ map (m Map.!) $ nexts n) m
 
 parser :: Parser [Int]
-parser = (0:) . sort <$> decimal `sepBy` "\n"
-
-tally :: Ord a => [a] -> Map a Int
-tally = foldr (Map.alter $ Just . (+1) . fromMaybe 0) Map.empty
+parser = (0 :) . sort <$> decimal `sepBy` "\n"
 
 get :: (Ord a, Integral v) => a -> Map a v -> v
 get = Map.findWithDefault 0
