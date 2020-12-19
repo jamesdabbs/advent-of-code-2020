@@ -14,8 +14,8 @@ data Expression
 
 data AST
   = Node Int
-  | Add (Seq AST)
-  | Mult (Seq AST)
+  | Add [AST]
+  | Mult [AST]
   deriving (Show, Eq)
 
 newtype SyntaxError = SyntaxError Text
@@ -23,39 +23,40 @@ newtype SyntaxError = SyntaxError Text
 
 solution :: Solution [Expression]
 solution = solve (parser `sepBy` "\n") $ \input -> do
-  part1 $ process (toAST associate) input -- Right 12956356593940
-  part2 $ process (toAST assocPlus) input -- Right 94240043727614
+  part1 $ process associate input -- Right 12956356593940
+  part2 $ process assocPlus input -- Right 94240043727614
 
-process :: (Expression -> Either SyntaxError AST) -> [Expression] -> Either SyntaxError Int
-process p input = sum . map evaluate <$> mapM p input
+process :: Traversable f => (Seq Expression -> Either SyntaxError AST) -> f Expression -> Either SyntaxError Int
+process p input = sum . map evaluate <$> mapM (groupsIn p) input
 
-toAST :: (Seq Expression -> Either SyntaxError AST) -> Expression -> Either SyntaxError AST
-toAST grouping (Parens exps) = grouping exps
-toAST _ (Term n) = Right $ Node n
-toAST _ exp = Left $ SyntaxError $ "cannot cast (" <> renderExp exp <> ") to AST"
+groupsIn :: (Seq Expression -> Either SyntaxError AST) -> Expression -> Either SyntaxError AST
+groupsIn grouping (Parens exps) = grouping exps
+groupsIn _ (Term n) = Right $ Node n
+groupsIn _ exp = Left $ SyntaxError $ "no groups in (" <> renderExp exp <> ")"
+
+walk ::
+  (Seq Expression -> Expression -> Either SyntaxError AST) ->
+  Seq Expression ->
+  Either SyntaxError AST
+walk adder (a :|> Plus :|> b) = adder a b
+walk adder (a :|> Times :|> b) = mult <$> walk adder a <*> walk adder `groupsIn` b
+walk adder (Empty :|> b) = walk adder `groupsIn` b
+walk _ exp = Left $ SyntaxError $ "walk failed at " <> renderExp (Parens exp)
 
 associate :: Seq Expression -> Either SyntaxError AST
-associate (a :|> Plus :|> b) = add <$> associate a <*> toAST associate b
-associate (a :|> Times :|> b) = mult <$> associate a <*> toAST associate b
-associate (Empty :|> b) = toAST associate b
-associate exp = Left $ SyntaxError $ "cannot associate without an operator " <> renderExp (Parens exp)
+associate = walk $ \a b -> add <$> associate a <*> associate `groupsIn` b
 
 assocPlus :: Seq Expression -> Either SyntaxError AST
-assocPlus se@(_ :<| Plus :<| _) =
-  let (addends, tail) = split Times se
-      head' = Add <$> mapM (toAST assocPlus) (noOp addends)
-   in case tail of
-        (Times :<| tail'') -> mult <$> head' <*> assocPlus tail''
-        _ -> head'
-assocPlus (a :<| Times :<| rest) = mult <$> toAST assocPlus a <*> assocPlus rest
-assocPlus (a :<| Empty) = toAST assocPlus a
-assocPlus e = Left $ SyntaxError $ "assocPlus " <> renderExp (Parens e)
+assocPlus = walk $ \a b -> case gatherPlus [b] a of
+  Left err -> Left err
+  Right (addends, Empty) -> Add <$> mapM (groupsIn assocPlus) addends
+  Right (addends, tail) -> mult <$> (Add <$> mapM (groupsIn assocPlus) addends) <*> assocPlus tail
 
-noOp :: Seq Expression -> Seq Expression
-noOp Empty = Empty
-noOp (a :<| as)
-  | a == Plus || a == Times = noOp as
-  | otherwise = a :<| noOp as
+gatherPlus :: [Expression] -> Seq Expression -> Either SyntaxError ([Expression], Seq Expression)
+gatherPlus acc (a :|> Plus :|> b) = gatherPlus (b : acc) a
+gatherPlus acc (a :|> Times :|> b) = Right (b : acc, a)
+gatherPlus acc (Empty :|> b) = Right (b : acc, Empty)
+gatherPlus _ exps = Left $ SyntaxError $ "gatherPlus failed at " <> renderExp (Parens exps)
 
 evaluate :: AST -> Int
 evaluate (Node n) = n
@@ -63,18 +64,10 @@ evaluate (Add nodes) = sum $ map evaluate nodes
 evaluate (Mult nodes) = product $ map evaluate nodes
 
 add :: AST -> AST -> AST
-add a b = Add $ Empty :|> a :|> b
+add a b = Add [a, b]
 
 mult :: AST -> AST -> AST
-mult a b = Mult $ Empty :|> a :|> b
-
-split :: Eq a => a -> Seq a -> (Seq a, Seq a)
-split delim = go Empty
-  where
-    go acc Empty = (acc, Empty)
-    go acc tail@(a :<| rest)
-      | a == delim = (acc, tail)
-      | otherwise = go (acc :|> a) rest
+mult a b = Mult [a, b]
 
 parser :: Parser Expression
 parser = Parens . Seq.fromList <$> expression `sepBy` " "

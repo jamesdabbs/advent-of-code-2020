@@ -7,14 +7,14 @@ import SpecImport hiding (evaluate, exp, group)
 spec :: Spec
 spec = parallel $ do
   describe "part1" $ do
-    let strategy = toAST associate
+    let strategy = groupsIn associate
 
     describe "syntax errors" $ do
       it "handles duplicate terms without an operator" $
-        strategy (toExp "1 2 3 + 4 + 5") `shouldBe` Left (SyntaxError "cannot associate without an operator (1 2 3)")
+        strategy (toExp "1 2 3 + 4 + 5") `shouldBe` Left (SyntaxError "walk failed at (1 2 3)")
 
       it "handles operators without terms" $
-        strategy (toExp "*") `shouldBe` Left (SyntaxError "cannot cast (*) to AST")
+        strategy (toExp "*") `shouldBe` Left (SyntaxError "no groups in (*)")
 
     forM_
       [ ("1 + 2 * 3 + 4 * 5 + 6", 71),
@@ -28,14 +28,14 @@ spec = parallel $ do
           fmap evaluate (strategy $ toExp exp) `shouldBe` Right val
 
   describe "part2" $ do
-    let strategy = toAST assocPlus
+    let strategy = groupsIn assocPlus
 
     it "groups additions together" $
       renderAST
         <$> strategy
           ( toExp "1 + 2 + 3 * 4 + 5 + 6 * 7 + 8 + 9"
           )
-        `shouldBe` Right "((1 + 2 + 3) * ((4 + 5 + 6) * (7 + 8 + 9)))"
+        `shouldBe` Right "((7 + 8 + 9) * ((4 + 5 + 6) * (1 + 2 + 3)))"
 
     forM_
       [ ("1 + 2 * 3 + 4 * 5 + 6", 231),
