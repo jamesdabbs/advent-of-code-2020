@@ -1,11 +1,11 @@
 module P07 where
 
 import Control.Lens (at, (%=))
-import Data.Attoparsec.Text (anyChar, manyTill)
+import Data.Attoparsec.Text (manyTill)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
-import Import hiding (takeWhile)
+import Import
 
 type Rule = (Text, [(Int, Text)])
 
