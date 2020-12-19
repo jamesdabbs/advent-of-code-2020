@@ -2,8 +2,8 @@ module P18 where
 
 import Data.Attoparsec.Text
 import Data.Sequence as Seq
+import qualified Data.Text as Text
 import Import hiding (evaluate, exp, group)
-import Prelude (error)
 
 data Expression
   = Term Int
@@ -18,10 +18,16 @@ data AST
   | Mult (Seq AST)
   deriving (Show, Eq)
 
+newtype SyntaxError = SyntaxError Text
+  deriving (Show, Eq)
+
 solution :: Solution [Expression]
 solution = solve (parser `sepBy` "\n") $ \input -> do
-  part1 $ sum $ map (evaluate . toAST associate) input -- 12956356593940
-  part2 $ sum $ map (evaluate . toAST associate . withGroups groupPlus) input -- 94240043727614
+  part1 $ process (toAST associate) input -- Right 12956356593940
+  part2 $ process (toAST associate . withGroups groupPlus) input -- Right 94240043727614
+
+process :: (Expression -> Either SyntaxError AST) -> [Expression] -> Either SyntaxError Int
+process p input = sum . map evaluate <$> mapM p input
 
 withGroups :: (Seq Expression -> Seq Expression) -> Expression -> Expression
 withGroups grouping (Parens exps) = Parens $ grouping exps
@@ -39,21 +45,27 @@ groupPlus (Parens exps :<| as) = Parens (groupPlus exps) :<| groupPlus as
 groupPlus (a :<| as) = a :<| groupPlus as
 groupPlus Empty = Empty
 
-toAST :: (Seq Expression -> AST) -> Expression -> AST
+toAST :: (Seq Expression -> Either SyntaxError AST) -> Expression -> Either SyntaxError AST
 toAST grouping (Parens exps) = grouping exps
-toAST _ (Term n) = Node n
-toAST _ exp = error ("toAST:" <> show exp)
+toAST _ (Term n) = Right $ Node n
+toAST _ exp = Left $ SyntaxError $ "cannot cast (" <> renderExp exp <> ") to AST"
 
-associate :: Seq Expression -> AST
-associate (a :|> Plus :|> b) = Add (Empty :|> associate a :|> toAST associate b)
-associate (a :|> Times :|> b) = Mult (Empty :|> associate a :|> toAST associate b)
+associate :: Seq Expression -> Either SyntaxError AST
+associate (a :|> Plus :|> b) = add <$> associate a <*> toAST associate b
+associate (a :|> Times :|> b) = mult <$> associate a <*> toAST associate b
 associate (Empty :|> b) = toAST associate b
-associate e = error ("associate:" <> show e)
+associate exp = Left $ SyntaxError $ "cannot associate without an operator " <> renderExp (Parens exp)
 
 evaluate :: AST -> Int
 evaluate (Node n) = n
 evaluate (Add nodes) = sum $ map evaluate nodes
 evaluate (Mult nodes) = product $ map evaluate nodes
+
+add :: AST -> AST -> AST
+add a b = Add $ Empty :|> a :|> b
+
+mult :: AST -> AST -> AST
+mult a b = Mult $ Empty :|> a :|> b
 
 split :: Eq a => a -> Seq a -> (Seq a, Seq a)
 split delim = go Empty
@@ -73,3 +85,18 @@ parser = Parens . Seq.fromList <$> expression `sepBy` " "
           Times <$ "*",
           "(" *> parser <* ")"
         ]
+
+{- Utilities below are not used for computing the solution, only in test helpers
+   and helpful error message generation
+-}
+
+renderAST :: AST -> Text
+renderAST (Node n) = show n
+renderAST (Add ns) = "(" <> Text.intercalate " + " (map renderAST $ toList ns) <> ")"
+renderAST (Mult ns) = "(" <> Text.intercalate " * " (map renderAST $ toList ns) <> ")"
+
+renderExp :: Expression -> Text
+renderExp (Term n) = show n
+renderExp Plus = "+"
+renderExp Times = "*"
+renderExp (Parens exps) = "(" <> Text.intercalate " " (map renderExp $ toList exps) <> ")"
