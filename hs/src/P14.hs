@@ -1,6 +1,6 @@
 module P14 where
 
-import Data.Attoparsec.Text (anyChar, count)
+import Data.Attoparsec.Text (count)
 import qualified Data.Map as Map
 import Import hiding (mask)
 
