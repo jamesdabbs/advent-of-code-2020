@@ -24,26 +24,10 @@ newtype SyntaxError = SyntaxError Text
 solution :: Solution [Expression]
 solution = solve (parser `sepBy` "\n") $ \input -> do
   part1 $ process (toAST associate) input -- Right 12956356593940
-  part2 $ process (toAST associate . withGroups groupPlus) input -- Right 94240043727614
+  part2 $ process (toAST assocPlus) input -- Right 94240043727614
 
 process :: (Expression -> Either SyntaxError AST) -> [Expression] -> Either SyntaxError Int
 process p input = sum . map evaluate <$> mapM p input
-
-withGroups :: (Seq Expression -> Seq Expression) -> Expression -> Expression
-withGroups grouping (Parens exps) = Parens $ grouping exps
-withGroups _ exp = exp
-
-groupPlus :: Seq Expression -> Seq Expression
-groupPlus se@(_ :<| Plus :<| _) =
-  let (addends, tail) = split Times se
-      head' = Parens (map (withGroups groupPlus) addends)
-      tail' = case tail of
-        (Times :<| tail'') -> Times :<| groupPlus tail''
-        _ -> Empty
-   in head' :<| tail'
-groupPlus (Parens exps :<| as) = Parens (groupPlus exps) :<| groupPlus as
-groupPlus (a :<| as) = a :<| groupPlus as
-groupPlus Empty = Empty
 
 toAST :: (Seq Expression -> Either SyntaxError AST) -> Expression -> Either SyntaxError AST
 toAST grouping (Parens exps) = grouping exps
@@ -55,6 +39,23 @@ associate (a :|> Plus :|> b) = add <$> associate a <*> toAST associate b
 associate (a :|> Times :|> b) = mult <$> associate a <*> toAST associate b
 associate (Empty :|> b) = toAST associate b
 associate exp = Left $ SyntaxError $ "cannot associate without an operator " <> renderExp (Parens exp)
+
+assocPlus :: Seq Expression -> Either SyntaxError AST
+assocPlus se@(_ :<| Plus :<| _) =
+  let (addends, tail) = split Times se
+      head' = Add <$> mapM (toAST assocPlus) (noOp addends)
+   in case tail of
+        (Times :<| tail'') -> mult <$> head' <*> assocPlus tail''
+        _ -> head'
+assocPlus (a :<| Times :<| rest) = mult <$> toAST assocPlus a <*> assocPlus rest
+assocPlus (a :<| Empty) = toAST assocPlus a
+assocPlus e = Left $ SyntaxError $ "assocPlus " <> renderExp (Parens e)
+
+noOp :: Seq Expression -> Seq Expression
+noOp Empty = Empty
+noOp (a :<| as)
+  | a == Plus || a == Times = noOp as
+  | otherwise = a :<| noOp as
 
 evaluate :: AST -> Int
 evaluate (Node n) = n

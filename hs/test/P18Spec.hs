@@ -28,14 +28,14 @@ spec = parallel $ do
           fmap evaluate (strategy $ toExp exp) `shouldBe` Right val
 
   describe "part2" $ do
-    let strategy = toAST associate . withGroups groupPlus
+    let strategy = toAST assocPlus
 
     it "groups additions together" $
       renderAST
         <$> strategy
           ( toExp "1 + 2 + 3 * 4 + 5 + 6 * 7 + 8 + 9"
           )
-        `shouldBe` Right "((((1 + 2) + 3) * ((4 + 5) + 6)) * ((7 + 8) + 9))"
+        `shouldBe` Right "((1 + 2 + 3) * ((4 + 5 + 6) * (7 + 8 + 9)))"
 
     forM_
       [ ("1 + 2 * 3 + 4 * 5 + 6", 231),
