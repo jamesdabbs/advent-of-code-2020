@@ -1,9 +1,8 @@
 module P18 where
 
-import Data.Attoparsec.Text
-import Data.Sequence as Seq
+import Data.Sequence as Seq (Seq (..), fromList, singleton)
 import qualified Data.Text as Text
-import Import hiding (evaluate, exp, group)
+import Import hiding (evaluate, exp)
 
 data Expression
   = Term Int
@@ -27,36 +26,37 @@ solution = solve (parser `sepBy` "\n") $ \input -> do
   part2 $ process assocPlus input -- Right 94240043727614
 
 process :: Traversable f => (Seq Expression -> Either SyntaxError AST) -> f Expression -> Either SyntaxError Int
-process p input = sum . map evaluate <$> mapM (groupsIn p) input
-
-groupsIn :: (Seq Expression -> Either SyntaxError AST) -> Expression -> Either SyntaxError AST
-groupsIn grouping (Parens exps) = grouping exps
-groupsIn _ (Term n) = Right $ Node n
-groupsIn _ exp = Left $ SyntaxError $ "no groups in (" <> renderExp exp <> ")"
+process assoc input = sum . map evaluate <$> mapM (assoc `groupsIn`) input
 
 walk ::
-  (Seq Expression -> Expression -> Either SyntaxError AST) ->
+  (Seq Expression -> Seq Expression -> Either SyntaxError AST) ->
   Seq Expression ->
   Either SyntaxError AST
-walk adder (a :|> Plus :|> b) = adder a b
-walk adder (a :|> Times :|> b) = mult <$> walk adder a <*> walk adder `groupsIn` b
-walk adder (Empty :|> b) = walk adder `groupsIn` b
+walk adder (a :|> Plus :|> b) = adder a (Seq.singleton b)
+walk adder (a :|> Times :|> b) = mult <$> walk adder a <*> walk adder (Seq.singleton b)
+walk adder (Empty :|> Parens exps) = walk adder exps
+walk _ (Empty :|> Term n) = Right $ Node n
 walk _ exp = Left $ SyntaxError $ "walk failed at " <> renderExp (Parens exp)
 
 associate :: Seq Expression -> Either SyntaxError AST
-associate = walk $ \a b -> add <$> associate a <*> associate `groupsIn` b
+associate = walk $ \a b -> add <$> associate a <*> associate b
 
 assocPlus :: Seq Expression -> Either SyntaxError AST
-assocPlus = walk $ \a b -> case gatherPlus [b] a of
+assocPlus = walk $ \a b -> case gatherPlus (toList b) a of
   Left err -> Left err
-  Right (addends, Empty) -> Add <$> mapM (groupsIn assocPlus) addends
-  Right (addends, tail) -> mult <$> (Add <$> mapM (groupsIn assocPlus) addends) <*> assocPlus tail
+  Right (addends, Empty) -> Add <$> mapM (assocPlus `groupsIn`) addends
+  Right (addends, tail) -> mult <$> (Add <$> mapM (assocPlus `groupsIn`) addends) <*> assocPlus tail
 
 gatherPlus :: [Expression] -> Seq Expression -> Either SyntaxError ([Expression], Seq Expression)
 gatherPlus acc (a :|> Plus :|> b) = gatherPlus (b : acc) a
 gatherPlus acc (a :|> Times :|> b) = Right (b : acc, a)
 gatherPlus acc (Empty :|> b) = Right (b : acc, Empty)
 gatherPlus _ exps = Left $ SyntaxError $ "gatherPlus failed at " <> renderExp (Parens exps)
+
+groupsIn :: (Seq Expression -> Either SyntaxError AST) -> Expression -> Either SyntaxError AST
+groupsIn grouping (Parens exps) = grouping exps
+groupsIn _ (Term n) = Right $ Node n
+groupsIn _ exp = Left $ SyntaxError $ "no groups in (" <> renderExp exp <> ")"
 
 evaluate :: AST -> Int
 evaluate (Node n) = n

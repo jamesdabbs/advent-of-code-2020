@@ -14,7 +14,7 @@ spec = parallel $ do
         strategy (toExp "1 2 3 + 4 + 5") `shouldBe` Left (SyntaxError "walk failed at (1 2 3)")
 
       it "handles operators without terms" $
-        strategy (toExp "*") `shouldBe` Left (SyntaxError "no groups in (*)")
+        strategy (toExp "*") `shouldBe` Left (SyntaxError "walk failed at (*)")
 
     forM_
       [ ("1 + 2 * 3 + 4 * 5 + 6", 71),
