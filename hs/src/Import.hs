@@ -11,7 +11,7 @@ where
 import Control.Arrow as X ((***), (>>>))
 import Control.Lens ((+=), (.=), _1, _2)
 import Data.Attoparsec.Text (Parser, atEnd, endOfInput, endOfLine, many', many1', notChar, parseOnly)
-import Data.Attoparsec.Text as X (Parser, anyChar, char, choice, decimal, digit, endOfInput, inClass, parseOnly, sepBy, string)
+import Data.Attoparsec.Text as X (Parser, anyChar, char, choice, decimal, digit, endOfInput, inClass, parseOnly, sepBy, string, takeText)
 import Data.Char as X (isAlpha, isSpace)
 import Data.Grid as X (Grid)
 import qualified Data.Map as Map

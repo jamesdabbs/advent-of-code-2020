@@ -2,3 +2,4 @@
   - --color
   - --cpp-simple
   - -XQuasiQuotes
+- ignore: {name: Use bimap}

@@ -1,6 +1,6 @@
 module P04 where
 
-import Data.Attoparsec.Text (count, satisfy, takeText, takeTill, takeWhile)
+import Data.Attoparsec.Text (count, satisfy, takeTill, takeWhile)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
