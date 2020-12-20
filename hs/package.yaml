@@ -78,6 +78,7 @@ tests:
     - aoc2020
     - heredoc
     - hspec
+    - QuickCheck
     - unix
     default-extensions:
     - QuasiQuotes

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d996ed74e0fa7e9d31c07f3afeee4ca53a55db22c1ccad7585a74367bd725a0b
+-- hash: 92825b99f507d0905fad5f1ca8c40503b26a8ed748db4991fab322e928e98bb8
 
 name:           aoc2020
 version:        0.1.0.0
@@ -47,6 +47,7 @@ library
       P17
       P18
       P19
+      P20
       Problems
   other-modules:
       Paths_aoc2020
@@ -117,6 +118,7 @@ test-suite test
       P17Spec
       P18Spec
       P19Spec
+      P20Spec
       RegressionSpec
       SpecImport
       Paths_aoc2020
@@ -128,7 +130,8 @@ test-suite test
       hlint:hlint
     , hpc-lcov:hpc-lcov
   build-depends:
-      aoc2020
+      QuickCheck
+    , aoc2020
     , attoparsec
     , base >=4.7 && <5
     , bytestring
