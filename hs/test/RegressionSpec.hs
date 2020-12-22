@@ -33,7 +33,7 @@ spec = do
           ("18", ("Right 12956356593940", "Right 94240043727614")),
           ("19", ("182", "334")),
           ("20", ("107399567124539", "Just 1555")),
-          ("20", ("2317", "kbdgs,sqvv,slkfgq,vgnj,brdd,tpd,csfmb,lrnz"))
+          ("21", ("2317", "\"kbdgs,sqvv,slkfgq,vgnj,brdd,tpd,csfmb,lrnz\""))
         ]
         $ \(n, expected) ->
           it (Text.unpack n) $
