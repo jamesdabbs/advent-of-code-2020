@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1ba6f1d0507940c2c5d4f395f733f2681ef8fa5896de0e75c4e7c0775800ff03
+-- hash: 2328c8aa9663ab45b6b76926f8c0573763f8258e391575f17da759bb4ac9ca21
 
 name:           aoc2020
 version:        0.1.0.0
@@ -49,13 +49,14 @@ library
       P19
       P20
       P21
+      P22
       Problems
   other-modules:
       Paths_aoc2020
   hs-source-dirs:
       src
   default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings PolyKinds RecordWildCards ScopedTypeVariables StandaloneDeriving TypeFamilies TypeOperators TypeSynonymInstances
-  ghc-options: -O2 -Wall -Werror -fno-warn-deprecations -fno-warn-unused-do-bind
+  ghc-options: -O3 -Wall -Werror -fno-warn-deprecations -fno-warn-unused-do-bind
   build-tool-depends:
       hlint:hlint
     , hpc-lcov:hpc-lcov
@@ -78,7 +79,7 @@ executable aoc
   hs-source-dirs:
       app
   default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings PolyKinds RecordWildCards ScopedTypeVariables StandaloneDeriving TypeFamilies TypeOperators TypeSynonymInstances
-  ghc-options: -O2 -Wall -Werror -fno-warn-deprecations -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -O3 -Wall -Werror -fno-warn-deprecations -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-tool-depends:
       hlint:hlint
     , hpc-lcov:hpc-lcov
@@ -121,13 +122,14 @@ test-suite test
       P19Spec
       P20Spec
       P21Spec
+      P22Spec
       RegressionSpec
       SpecImport
       Paths_aoc2020
   hs-source-dirs:
       test
   default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings PolyKinds RecordWildCards ScopedTypeVariables StandaloneDeriving TypeFamilies TypeOperators TypeSynonymInstances QuasiQuotes
-  ghc-options: -O2 -Wall -Werror -fno-warn-deprecations -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -O3 -Wall -Werror -fno-warn-deprecations -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-tool-depends:
       hlint:hlint
     , hpc-lcov:hpc-lcov
