@@ -46,7 +46,7 @@ default-extensions:
 - TypeOperators
 - TypeSynonymInstances
 ghc-options:
-- -O2
+- -O3
 - -Wall
 - -Werror
 - -fno-warn-deprecations
