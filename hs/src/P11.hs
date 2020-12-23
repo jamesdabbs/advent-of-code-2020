@@ -1,14 +1,17 @@
 module P11 where
 
-import Import hiding (Location)
 import qualified Data.Map as Map
+import Import hiding (Empty, Location)
 
 data Seat = Empty | Occupied | Floor
   deriving (Show, Eq)
 
 type Location = (Int, Int)
+
 type Vector = (Int, Int)
+
 type Seats = Map Location Seat
+
 type Adjacencies = Map Location [Location]
 
 solution :: Solution Seats
@@ -23,13 +26,15 @@ stabilize :: Adjacencies -> Int -> Seats -> Seats
 stabilize adjacencies threshold seats
   | next == seats = seats
   | otherwise = stabilize adjacencies threshold next
-  where next = evolve adjacencies threshold seats
+  where
+    next = evolve adjacencies threshold seats
 
 evolve :: Adjacencies -> Int -> Seats -> Seats
-evolve adjacencies threshold seats = Map.foldrWithKey
-  (\location -> Map.insert location . toggle adjacencies threshold seats location)
-  Map.empty
-  seats
+evolve adjacencies threshold seats =
+  Map.foldrWithKey
+    (\location -> Map.insert location . toggle adjacencies threshold seats location)
+    Map.empty
+    seats
 
 toggle :: Adjacencies -> Int -> Seats -> Location -> Seat -> Seat
 toggle a threshold seats location s
@@ -39,17 +44,17 @@ toggle a threshold seats location s
   where
     adjacent =
       Map.findWithDefault [] location a
-      & map (`Map.lookup` seats)
-      & filter (== Just Occupied)
-      & length
+        & map (`Map.lookup` seats)
+        & filter (== Just Occupied)
+        & length
 
 neighborhoods :: Seats -> Adjacencies
-neighborhoods seats = Map.fromList [ (loc, neighbors loc) | loc <- Map.keys seats ]
+neighborhoods seats = Map.fromList [(loc, neighbors loc) | loc <- Map.keys seats]
   where
-    neighbors (x, y) = [ (x + dx, y + dy) | (dx, dy) <- directions ]
+    neighbors (x, y) = [(x + dx, y + dy) | (dx, dy) <- directions]
 
 linesOfSight :: Seats -> Adjacencies
-linesOfSight seats = Map.fromList [ (loc, visible loc) | loc <- Map.keys seats ]
+linesOfSight seats = Map.fromList [(loc, visible loc) | loc <- Map.keys seats]
   where
     visible l = mapMaybe (walk l) directions
 
@@ -59,7 +64,7 @@ linesOfSight seats = Map.fromList [ (loc, visible loc) | loc <- Map.keys seats ]
       Nothing -> Nothing
 
 directions :: [Vector]
-directions = [ (x,y) | x <- [-1 .. 1], y <- [-1 .. 1], (x, y) /= (0, 0)]
+directions = [(x, y) | x <- [-1 .. 1], y <- [-1 .. 1], (x, y) /= (0, 0)]
 
 parser :: Parser Seats
 parser = foldl collect Map.empty <$> grid

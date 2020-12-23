@@ -16,6 +16,7 @@ import Data.Attoparsec.Text as X (Parser, anyChar, char, choice, decimal, digit,
 import Data.Char as X (isAlpha, isSpace)
 import Data.Grid as X (Grid)
 import qualified Data.Map as Map
+import Data.Sequence as X (Seq (..), (<|), (|>))
 import Data.String as X (String)
 import Protolude as X
 import Santa.Solution as X (Solution, part1, part2, solve)

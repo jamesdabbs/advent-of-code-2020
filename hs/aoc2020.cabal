@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2328c8aa9663ab45b6b76926f8c0573763f8258e391575f17da759bb4ac9ca21
+-- hash: ad910e729217e7c397521254260d830b82fafc77f2e4ddd0a25c1e695c9c75d3
 
 name:           aoc2020
 version:        0.1.0.0
@@ -50,6 +50,7 @@ library
       P20
       P21
       P22
+      P23
       Problems
   other-modules:
       Paths_aoc2020
@@ -67,9 +68,11 @@ library
     , containers
     , lens
     , mtl
+    , primitive
     , protolude
     , santa
     , text
+    , vector
   default-language: Haskell2010
 
 executable aoc
@@ -91,9 +94,11 @@ executable aoc
     , containers
     , lens
     , mtl
+    , primitive
     , protolude
     , santa
     , text
+    , vector
   default-language: Haskell2010
 
 test-suite test
@@ -123,6 +128,7 @@ test-suite test
       P20Spec
       P21Spec
       P22Spec
+      P23Spec
       RegressionSpec
       SpecImport
       Paths_aoc2020
@@ -144,8 +150,10 @@ test-suite test
     , hspec
     , lens
     , mtl
+    , primitive
     , protolude
     , santa
     , text
     , unix
+    , vector
   default-language: Haskell2010

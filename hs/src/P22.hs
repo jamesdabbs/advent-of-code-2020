@@ -1,7 +1,6 @@
 module P22 where
 
 import qualified Data.Map as Map
-import Data.Sequence (Seq (..))
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
 import Import

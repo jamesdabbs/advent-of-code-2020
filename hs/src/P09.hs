@@ -1,6 +1,5 @@
 module P09 where
 
-import Data.Sequence (Seq (..), (|>))
 import qualified Data.Sequence as Seq
 import Import
 import P01 (findPair)

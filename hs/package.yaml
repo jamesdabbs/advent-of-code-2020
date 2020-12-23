@@ -25,9 +25,11 @@ dependencies:
 - containers
 - lens
 - mtl
+- primitive
 - protolude
 - santa
 - text
+- vector
 
 default-extensions:
 - DeriveGeneric

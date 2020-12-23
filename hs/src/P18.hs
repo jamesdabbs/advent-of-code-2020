@@ -1,6 +1,6 @@
 module P18 where
 
-import Data.Sequence as Seq (Seq (..), fromList, singleton)
+import qualified Data.Sequence as Seq (fromList, singleton)
 import qualified Data.Text as Text
 import Import hiding (evaluate, exp)
 
