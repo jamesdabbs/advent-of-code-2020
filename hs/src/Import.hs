@@ -2,6 +2,7 @@ module Import
   ( module X,
     countWhere,
     grid,
+    inc,
     inspect,
     inspect',
     sepBy1,
@@ -53,7 +54,10 @@ inspect' :: Show a => Text -> a -> a
 inspect' label a = trace (label <> ": " <> show a) a
 
 tally :: Ord a => [a] -> Map a Int
-tally = foldr (Map.alter (Just . maybe 1 (+ 1))) Map.empty
+tally = foldr inc Map.empty
 
 countWhere :: (a -> Bool) -> [a] -> Int
 countWhere f = foldl (\acc a -> if f a then acc + 1 else acc) 0
+
+inc :: Ord a => a -> Map a Int -> Map a Int
+inc = Map.alter (Just . maybe 1 (+ 1))
