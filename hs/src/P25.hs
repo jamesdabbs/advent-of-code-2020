@@ -6,8 +6,7 @@ type Input = (Int, Int)
 
 solution :: Solution Input
 solution = solve parser $ \(card, door) -> do
-  part1 $ transform (crack 7 card) door --
-  part2 $ ()
+  part1 $ transform (crack 7 card) door -- 20201227
 
 transform :: Int -> Int -> Int
 transform loop subject = applyN loop (step subject) 1
