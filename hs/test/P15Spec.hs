@@ -1,7 +1,7 @@
 module P15Spec where
 
 import P15
-import SpecImport
+import SpecImport hiding (round)
 
 ex :: Text
 ex = [here|0,3,6|]
@@ -10,11 +10,13 @@ spec :: Spec
 spec = parallel $ do
   let input = parseRight parser ex
 
-  it "solves part 1" $ do
-    spoken input 4 `shouldBe` 0
-    spoken input 5 `shouldBe` 3
-    spoken input 6 `shouldBe` 3
-    spoken input 7 `shouldBe` 1
-    spoken input 8 `shouldBe` 0
-    spoken input 9 `shouldBe` 4
-    spoken input 2020 `shouldBe` 436
+  let examples =
+        [ (7, 1),
+          (8, 0),
+          (9, 4),
+          (2020, 436)
+        ]
+
+  forM_ examples $ \(round, expected) ->
+    it ("has the expected value for round " <> show round) $
+      spoken input round `shouldReturn` expected
