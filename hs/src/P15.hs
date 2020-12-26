@@ -1,29 +1,34 @@
 module P15 where
 
-import qualified Data.IntMap.Strict as IM
+import qualified Data.Vector.Unboxed.Mutable as MV
 import Import hiding (round)
 
 type Input = [Int]
 
 solution :: Solution Input
 solution = solve parser $ \input -> do
-  part1 $ spoken input 2020 -- 763
-  part2 $ spoken input 30000000 -- 1876406
+  part1 $ runST $ spoken input 2020 -- 763
+  part2 $ runST $ spoken input 30000000 -- 1876406
 
-spoken :: [Int] -> Int -> Int
-spoken = go 0 . seed
+spoken :: PrimMonad m => [Int] -> Int -> m Int
+spoken init len = do
+  v <- MV.replicate len unseen
+  go v =<< seed v 1 init
   where
-    seed :: [Int] -> (IM.IntMap Int, Int)
-    seed = foldl (\(acc, round) n -> (IM.insert n round acc, round + 1)) (IM.empty, 1)
+    unseen = -1
 
-    go :: Int -> (IM.IntMap Int, Int) -> Int -> Int
-    go last (said, round) target
-      | round == target = last
-      | otherwise =
-        go
-          (maybe 0 (round -) $ IM.lookup last said)
-          (IM.insert last round said, round + 1)
-          target
+    seed _ round [last] = return (round, last)
+    seed v round (a : as) = do
+      MV.write v a round
+      seed v (round + 1) as
+    seed _ round _ = return (round, unseen)
+
+    go said (round, last)
+      | round == len = return last
+      | otherwise = do
+        previous <- MV.read said last
+        MV.write said last round
+        go said (round + 1, if previous == unseen then 0 else round - previous)
 
 parser :: Parser Input
 parser = decimal `sepBy` ","

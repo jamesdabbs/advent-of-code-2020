@@ -1,6 +1,5 @@
 module P23 where
 
-import Control.Monad.Primitive (PrimMonad, PrimState)
 import Data.Char (digitToInt)
 import qualified Data.Vector.Unboxed.Mutable as MV
 import Import hiding (from, rotate, shift, to)
